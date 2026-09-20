@@ -1,0 +1,31 @@
+[
+  {
+    "Author": "MusicYYin",
+    "Name": "Soumen",
+    "Punchline": "藏宝图队伍坐标选择与自动导航。",
+    "Description": "监听小队或跨服小队坐标，提供多发送者目的地选择，并通过 vnavmesh 完成传送评估、上坐骑、导航、落地与下坐骑。",
+    "InternalName": "Soumen",
+    "AssemblyVersion": "0.2.0.0",
+    "RepoUrl": "https://github.com/MusicYYin/Soumen",
+    "ApplicableVersion": "any",
+    "DalamudApiLevel": 15,
+    "Tags": [
+      "treasure",
+      "map",
+      "navigation",
+      "automation",
+      "Chinese"
+    ],
+    "IsHide": false,
+    "IsTestingExclusive": false,
+    "DownloadLinkInstall": "https://github.com/MusicYYin/Soumen/releases/download/0.2.0.0/Soumen.zip",
+    "DownloadLinkTesting": "https://github.com/MusicYYin/Soumen/releases/download/0.2.0.0/Soumen.zip",
+    "DownloadLinkUpdate": "https://github.com/MusicYYin/Soumen/releases/download/0.2.0.0/Soumen.zip",
+    "LoadRequiredState": 0,
+    "LoadSync": false,
+    "LoadPriority": 0,
+    "CanUnloadAsync": false,
+    "AcceptsFeedback": true,
+    "LastUpdated": "2026-09-20T00:00:00Z"
+  }
+]
