@@ -5,7 +5,7 @@
     "Punchline": "藏宝图导航与自动流程。",
     "Description": "读取队伍坐标，自动导航并处理藏宝图流程。",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.4.4.1",
+    "AssemblyVersion": "0.4.5.0",
     "RepoUrl": "https://github.com/MusicYYin/Soumen",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/Soumen/main/icon.png",
     "ApplicableVersion": "any",
@@ -19,14 +19,14 @@
     ],
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkInstall": "https://github.com/MusicYYin/Soumen/releases/download/0.4.4.1/Soumen.zip",
-    "DownloadLinkTesting": "https://github.com/MusicYYin/Soumen/releases/download/0.4.4.1/Soumen.zip",
-    "DownloadLinkUpdate": "https://github.com/MusicYYin/Soumen/releases/download/0.4.4.1/Soumen.zip",
+    "DownloadLinkInstall": "https://github.com/MusicYYin/Soumen/releases/download/0.4.5.0/Soumen.zip",
+    "DownloadLinkTesting": "https://github.com/MusicYYin/Soumen/releases/download/0.4.5.0/Soumen.zip",
+    "DownloadLinkUpdate": "https://github.com/MusicYYin/Soumen/releases/download/0.4.5.0/Soumen.zip",
     "LoadRequiredState": 0,
     "LoadSync": false,
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-09-22T00:00:00Z"
+    "LastUpdated": "2026-09-22T13:04:31Z"
   }
 ]
