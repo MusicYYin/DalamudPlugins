@@ -2,10 +2,10 @@
   {
     "Author": "MusicYYin",
     "Name": "Soumen",
-    "Punchline": "藏宝图导航与自动流程。",
-    "Description": "读取队伍坐标，自动导航并处理藏宝图流程。",
+    "Punchline": "藏宝图导航、自动流程与狩猎跟车。",
+    "Description": "读取队伍坐标，自动导航并处理藏宝图流程；识别狩猎车头地图链接并规划跟车路线。",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.4.7.4",
+    "AssemblyVersion": "0.4.8.0",
     "RepoUrl": "https://github.com/MusicYYin/Soumen",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/Soumen/main/icon.png",
     "ApplicableVersion": "any",
@@ -15,18 +15,19 @@
       "map",
       "navigation",
       "automation",
-      "Chinese"
+      "Chinese",
+      "hunt"
     ],
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkInstall": "https://github.com/MusicYYin/Soumen/releases/download/0.4.7.4/Soumen.zip",
-    "DownloadLinkTesting": "https://github.com/MusicYYin/Soumen/releases/download/0.4.7.4/Soumen.zip",
-    "DownloadLinkUpdate": "https://github.com/MusicYYin/Soumen/releases/download/0.4.7.4/Soumen.zip",
+    "DownloadLinkInstall": "https://github.com/MusicYYin/Soumen/releases/download/0.4.8.0/Soumen.zip",
+    "DownloadLinkTesting": "https://github.com/MusicYYin/Soumen/releases/download/0.4.8.0/Soumen.zip",
+    "DownloadLinkUpdate": "https://github.com/MusicYYin/Soumen/releases/download/0.4.8.0/Soumen.zip",
     "LoadRequiredState": 0,
     "LoadSync": false,
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-09-25T10:43:28Z"
+    "LastUpdated": "2026-09-25T12:58:27Z"
   }
 ]
