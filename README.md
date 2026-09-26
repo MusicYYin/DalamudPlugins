@@ -14,4 +14,4 @@ https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/pluginmaster.jso
 
 | 名称 | 说明 |
 | --- | --- |
-| [Soumen](https://github.com/MusicYYin/Soumen) | 小队藏宝图坐标导航 |
+| [Soumen](https://github.com/MusicYYin/Soumen) | 实用工具 |
