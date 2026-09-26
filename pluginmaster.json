@@ -2,10 +2,10 @@
   {
     "Author": "MusicYYin",
     "Name": "Soumen",
-    "Punchline": "FF14 自动化工具：寻宝与狩猎。",
-    "Description": "提供藏宝图流程与狩猎车头跟随。",
+    "Punchline": "FF14 自动化工具：寻宝、狩猎与工具。",
+    "Description": "提供藏宝图流程、狩猎车头跟随和工具面板。",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.5.5.2",
+    "AssemblyVersion": "0.5.6.0",
     "RepoUrl": "https://github.com/MusicYYin/Soumen",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/Soumen/main/icon.png",
     "ApplicableVersion": "any",
@@ -16,18 +16,20 @@
       "navigation",
       "automation",
       "Chinese",
-      "hunt"
+      "hunt",
+      "tools",
+      "PvP"
     ],
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkInstall": "https://github.com/MusicYYin/Soumen/releases/download/0.5.5.2/Soumen.zip",
-    "DownloadLinkTesting": "https://github.com/MusicYYin/Soumen/releases/download/0.5.5.2/Soumen.zip",
-    "DownloadLinkUpdate": "https://github.com/MusicYYin/Soumen/releases/download/0.5.5.2/Soumen.zip",
+    "DownloadLinkInstall": "https://github.com/MusicYYin/Soumen/releases/download/0.5.6.0/Soumen.zip",
+    "DownloadLinkTesting": "https://github.com/MusicYYin/Soumen/releases/download/0.5.6.0/Soumen.zip",
+    "DownloadLinkUpdate": "https://github.com/MusicYYin/Soumen/releases/download/0.5.6.0/Soumen.zip",
     "LoadRequiredState": 0,
     "LoadSync": false,
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-09-26T09:18:07.531Z"
+    "LastUpdated": "2026-09-26T12:00:10.128Z"
   }
 ]
