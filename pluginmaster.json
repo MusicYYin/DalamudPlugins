@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.5.7.4",
+    "AssemblyVersion": "0.5.7.5",
     "RepoUrl": "https://github.com/MusicYYin/Soumen",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/Soumen/main/icon.png",
     "ApplicableVersion": "any",
@@ -17,14 +17,14 @@
     ],
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkInstall": "https://github.com/MusicYYin/Soumen/releases/download/0.5.7.4/Soumen.zip",
-    "DownloadLinkTesting": "https://github.com/MusicYYin/Soumen/releases/download/0.5.7.4/Soumen.zip",
-    "DownloadLinkUpdate": "https://github.com/MusicYYin/Soumen/releases/download/0.5.7.4/Soumen.zip",
+    "DownloadLinkInstall": "https://github.com/MusicYYin/Soumen/releases/download/0.5.7.5/Soumen.zip",
+    "DownloadLinkTesting": "https://github.com/MusicYYin/Soumen/releases/download/0.5.7.5/Soumen.zip",
+    "DownloadLinkUpdate": "https://github.com/MusicYYin/Soumen/releases/download/0.5.7.5/Soumen.zip",
     "LoadRequiredState": 0,
     "LoadSync": false,
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-09-26T15:20:01.497Z"
+    "LastUpdated": "2026-09-26T15:54:00.050Z"
   }
 ]
