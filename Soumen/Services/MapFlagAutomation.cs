@@ -633,9 +633,14 @@ public sealed class MapFlagAutomation : IDisposable
 
     private unsafe void ProcessDungeonFollow()
     {
-        if (!configuration.DungeonAutoFollow || paused || IsLoadingOrOccupied() || Plugin.Condition[ConditionFlag.InCombat])
+        if (!configuration.DungeonAutoFollow || paused)
         {
             StopDungeonFollow();
+            return;
+        }
+        if (IsLoadingOrOccupied() || Plugin.Condition[ConditionFlag.InCombat])
+        {
+            SuspendDungeonFollow();
             return;
         }
 
@@ -646,7 +651,7 @@ public sealed class MapFlagAutomation : IDisposable
         {
             diagnostics.WriteThrottled("bmr-no-party-leader", "BMR跟随",
                 "尚未取得小队队长信息。", TimeSpan.FromSeconds(10));
-            StopDungeonFollow();
+            SuspendDungeonFollow();
             return;
         }
 
@@ -657,12 +662,12 @@ public sealed class MapFlagAutomation : IDisposable
         {
             diagnostics.WriteThrottled("bmr-no-visible-leader", "BMR跟随",
                 $"队长当前不可见或队长是本人；entityId={leaderId}。", TimeSpan.FromSeconds(10));
-            StopDungeonFollow();
+            SuspendDungeonFollow();
             return;
         }
 
         var gap = Vector3.Distance(player.Position, leader.Position);
-        var distance = Math.Clamp(configuration.DungeonFollowDistance, 1.5f, 12f);
+        var distance = Math.Clamp(configuration.DungeonFollowDistance, 0f, 10f);
         var leaderContentId = group->PartyMembers[(int)group->PartyLeaderIndex].ContentId;
         if (externalPlugins.SetDungeonFollow(leaderContentId, leader.Name.TextValue, distance))
         {
@@ -672,18 +677,22 @@ public sealed class MapFlagAutomation : IDisposable
             return;
         }
 
-        if (dungeonFollowByBossMod) StopDungeonFollow();
+        if (dungeonFollowByBossMod) SuspendDungeonFollow();
         StatusText = "BMR 跟随未就绪，请在关于页开启诊断模式查看原因";
     }
 
     private void StopDungeonFollow()
     {
-        if (dungeonFollowByBossMod)
-        {
-            externalPlugins.StopDungeonFollow();
-            dungeonFollowByBossMod = false;
-            externalPlugins.SetNavigating(false);
-        }
+        externalPlugins.StopDungeonFollow();
+        if (dungeonFollowByBossMod) externalPlugins.SetNavigating(false);
+        dungeonFollowByBossMod = false;
+    }
+
+    private void SuspendDungeonFollow()
+    {
+        externalPlugins.SuspendDungeonFollow();
+        if (dungeonFollowByBossMod) externalPlugins.SetNavigating(false);
+        dungeonFollowByBossMod = false;
     }
 
     private void SelectTarget(MapFlagTarget target, bool isManual)

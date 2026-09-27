@@ -35,14 +35,15 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
 
         try
         {
-            ((GameObject*)player.Address)->SetPosition(destination.X, destination.Y, destination.Z);
-            if (Vector3.DistanceSquared(player.Position, destination) > 0.25f)
+            var gameObject = (GameObject*)player.Address;
+            gameObject->SetPosition(destination.X, destination.Y, destination.Z);
+            if (Vector3.DistanceSquared(gameObject->Position, destination) > 0.25f)
             {
                 status = "客户端未确认位置变更；此地图或当前状态可能不支持坐标传送。";
                 diagnostics.Write("工具传送", status);
                 return false;
             }
-            status = $"已设置位置：X={destination.X:F2}，Y={destination.Y:F2}，Z={destination.Z:F2}。";
+            status = $"已写入世界坐标：X={destination.X:F2}，Y={destination.Y:F2}，Z={destination.Z:F2}。";
             diagnostics.Write("工具传送", $"当前地图 {Plugin.ClientState.TerritoryType}：{status}");
             return true;
         }

@@ -15,7 +15,6 @@ public sealed class ExternalPluginCoordinator
     private float dungeonFollowDistance = float.NaN;
     private float? dungeonFollowOriginalDistance;
     private int? dungeonFollowOriginalSlot;
-    private bool? dungeonFollowOriginalTarget;
     private DateTime nextBossModSettingsReadUtc = DateTime.MinValue;
     private DateTime nextDungeonFollowAttemptUtc = DateTime.MinValue;
     private LazyLootRollMode? appliedLazyLootRollMode;
@@ -77,7 +76,6 @@ public sealed class ExternalPluginCoordinator
             dungeonFollowSlot = -1;
             dungeonFollowOriginalDistance = null;
             dungeonFollowOriginalSlot = null;
-            dungeonFollowOriginalTarget = null;
             nextBossModSettingsReadUtc = DateTime.MinValue;
             nextDungeonFollowAttemptUtc = DateTime.MinValue;
         }
@@ -125,35 +123,39 @@ public sealed class ExternalPluginCoordinator
             diagnostics.Write("BMR跟随", $"未能把队长 {leaderName}（{leaderContentId}）匹配到 BMR 队伍槽位，五秒后重试。");
             return false;
         }
-        if (dungeonFollowArmed && dungeonFollowSlot != slot) StopDungeonFollow();
+        if (dungeonFollowSlot >= 0 && dungeonFollowSlot != slot) StopDungeonFollow();
+        if (dungeonFollowArmed && !IsBossModFollowingSlot(slot))
+        {
+            SuspendDungeonFollow();
+            nextDungeonFollowAttemptUtc = DateTime.UtcNow.AddSeconds(2);
+            diagnostics.Write("BMR跟随", "BMR AI 已闲置或队长槽位丢失，两秒后重新选择队长。");
+            return false;
+        }
         if (!dungeonFollowArmed)
         {
             if (!TryCaptureBossModFollowSettings()) return false;
-            if (!Execute($"/bmrai follow slot{slot + 1}"))
+            // Switching BMR's master recreates its AI. Only do this for a new leader or if BMR went idle.
+            var aiIsFollowingLeader = IsBossModFollowingSlot(slot);
+            if (dungeonFollowSlot == slot && !aiIsFollowingLeader)
+                diagnostics.Write("BMR跟随", "检测到 BMR AI 闲置或跟随槽位改变，重新选择队长。");
+            if ((dungeonFollowSlot != slot || !aiIsFollowingLeader)
+                && !Execute($"/bmrai follow slot{slot + 1}"))
             {
                 nextDungeonFollowAttemptUtc = DateTime.UtcNow.AddSeconds(5);
                 diagnostics.Write("BMR跟随", "BMR 未注册 /bmrai 命令，五秒后重试。");
                 return false;
             }
-            // BMR's slot-follow mode follows the party member without targeting them.
-            Execute("/bmrai followtarget off");
             Execute($"/bmrai maxdistanceslot {distance.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)}");
             Execute("/bmrai followoutofcombat on");
-            if ((!TryReadBossModFollowState(out var currentOoc, out var currentTarget)
-                    || !currentOoc || currentTarget)
-                && !TrySetBossModFollowSettings(true, false, distance))
+            if ((!TryReadBossModFollowState(out var currentOoc) || !currentOoc)
+                && !TrySetBossModFollowSettings(true, distance))
             {
-                dungeonFollowArmed = true;
-                StopDungeonFollow();
                 nextDungeonFollowAttemptUtc = DateTime.UtcNow.AddSeconds(5);
                 diagnostics.Write("BMR跟随", "BMR 脱战跟随设置未生效，五秒后重试。");
                 return false;
             }
-            if (!TryReadBossModFollowState(out var followOutOfCombat, out var followTarget)
-                || !followOutOfCombat || followTarget)
+            if (!TryReadBossModFollowState(out var followOutOfCombat) || !followOutOfCombat)
             {
-                dungeonFollowArmed = true;
-                StopDungeonFollow();
                 nextDungeonFollowAttemptUtc = DateTime.UtcNow.AddSeconds(5);
                 diagnostics.Write("BMR跟随", "BMR 未开启队友槽位脱战跟随，五秒后重试。");
                 return false;
@@ -167,7 +169,7 @@ public sealed class ExternalPluginCoordinator
         if (float.IsNaN(dungeonFollowDistance) || Math.Abs(dungeonFollowDistance - distance) > 0.05f)
         {
             Execute($"/bmrai maxdistanceslot {distance.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)}");
-            if (TrySetBossModFollowSettings(true, false, distance))
+            if (TrySetBossModFollowSettings(true, distance))
             {
                 dungeonFollowDistance = distance;
                 diagnostics.Write("BMR跟随", $"队友槽位跟随距离设为 {distance:F1}y。");
@@ -176,26 +178,46 @@ public sealed class ExternalPluginCoordinator
         return true;
     }
 
-    public void StopDungeonFollow()
+    public void SuspendDungeonFollow()
     {
         if (!dungeonFollowArmed) return;
         dungeonFollowArmed = false;
+        if (!BossModRebornInstalled) return;
+        Execute("/bmrai followoutofcombat off");
+        diagnostics.Write("BMR跟随", "战斗或暂时不可跟随，已关闭 BMR 脱战跟随；BMR AI 及跟随目标保持原设置。");
+    }
+
+    public void StopDungeonFollow()
+    {
+        if (!dungeonFollowArmed && dungeonFollowOriginalSlot == null) return;
+        var wasArmed = dungeonFollowArmed;
+        SuspendDungeonFollow();
+        var selectedSlot = dungeonFollowSlot;
         dungeonFollowSlot = -1;
         dungeonFollowDistance = float.NaN;
         var originalDistance = dungeonFollowOriginalDistance;
         var originalSlot = dungeonFollowOriginalSlot;
-        var originalTarget = dungeonFollowOriginalTarget;
         dungeonFollowOriginalDistance = null;
         dungeonFollowOriginalSlot = null;
-        dungeonFollowOriginalTarget = null;
         if (!BossModRebornInstalled) return;
-        Execute("/bmrai followoutofcombat off");
-        Execute($"/bmrai followtarget {(originalTarget == true ? "on" : "off")}");
+        if (!wasArmed) Execute("/bmrai followoutofcombat off");
         if (originalDistance is { } distance)
             Execute($"/bmrai maxdistanceslot {distance.ToString("R", System.Globalization.CultureInfo.InvariantCulture)}");
-        if (originalSlot is >= 0 and < 8)
+        if (selectedSlot != originalSlot && originalSlot is >= 0 and < 8)
             Execute($"/bmrai follow slot{originalSlot.Value + 1}");
         diagnostics.Write("BMR跟随", "已关闭 BMR 脱战跟随并恢复原队友槽位。");
+    }
+
+    private static bool IsBossModFollowingSlot(int slot)
+    {
+        try
+        {
+            var type = GetActiveBossModManagerType();
+            var instance = type?.GetField("Instance", BindingFlags.Static | BindingFlags.Public)?.GetValue(null);
+            return type?.GetField("MasterSlot", BindingFlags.Instance | BindingFlags.Public)?.GetValue(instance) is int masterSlot
+                && masterSlot == slot && type.GetField("Beh", BindingFlags.Instance | BindingFlags.Public)?.GetValue(instance) != null;
+        }
+        catch { return false; }
     }
 
     private static bool TryGetBossModPartySlot(ulong contentId, out int slot)
@@ -319,14 +341,12 @@ public sealed class ExternalPluginCoordinator
             var distance = configType?.GetField("MaxDistanceToSlot", BindingFlags.Instance | BindingFlags.Public)?.GetValue(config);
             var slot = configType?.GetField("FollowSlot", BindingFlags.Instance | BindingFlags.Public)?.GetValue(config);
             var outOfCombat = configType?.GetField("FollowOutOfCombat", BindingFlags.Instance | BindingFlags.Public)?.GetValue(config);
-            var target = configType?.GetField("FollowTarget", BindingFlags.Instance | BindingFlags.Public)?.GetValue(config);
             if (distance is not float originalDistance || slot is not int originalSlot || originalSlot is < 0 or > 7
-                || outOfCombat is not bool originalOutOfCombat || target is not bool originalTarget)
+                || outOfCombat is not bool)
                 throw new InvalidOperationException($"BMR AI 配置不可读：AIManager={managerType != null}，config={config != null}，distance={distance?.GetType().Name ?? "null"}，slot={slot?.GetType().Name ?? "null"}。");
 
             dungeonFollowOriginalDistance = originalDistance;
             dungeonFollowOriginalSlot = originalSlot;
-            dungeonFollowOriginalTarget = originalTarget;
             nextBossModSettingsReadUtc = DateTime.MinValue;
             diagnostics.Write("BMR跟随", $"已保存原队友槽位距离 {originalDistance:F1}y，原跟随槽位 {originalSlot + 1}。");
             return true;
@@ -340,7 +360,7 @@ public sealed class ExternalPluginCoordinator
         }
     }
 
-    private bool TrySetBossModFollowSettings(bool outOfCombat, bool target, float distance)
+    private bool TrySetBossModFollowSettings(bool outOfCombat, float distance)
     {
         try
         {
@@ -348,11 +368,9 @@ public sealed class ExternalPluginCoordinator
             if (config == null) return false;
             var type = config.GetType();
             var oocField = type.GetField("FollowOutOfCombat", BindingFlags.Instance | BindingFlags.Public);
-            var targetField = type.GetField("FollowTarget", BindingFlags.Instance | BindingFlags.Public);
             var distanceField = type.GetField("MaxDistanceToSlot", BindingFlags.Instance | BindingFlags.Public);
-            if (oocField == null || targetField == null || distanceField == null) return false;
+            if (oocField == null || distanceField == null) return false;
             oocField.SetValue(config, outOfCombat);
-            targetField.SetValue(config, target);
             distanceField.SetValue(config, distance);
             return true;
         }
@@ -367,20 +385,17 @@ public sealed class ExternalPluginCoordinator
         => GetActiveBossModManagerType()?
             .GetField("_config", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null);
 
-    private static bool TryReadBossModFollowState(out bool followOutOfCombat, out bool followTarget)
+    private static bool TryReadBossModFollowState(out bool followOutOfCombat)
     {
         followOutOfCombat = false;
-        followTarget = false;
         try
         {
             var config = GetBossModConfig();
             if (config == null) return false;
             var type = config.GetType();
-            if (type.GetField("FollowOutOfCombat")?.GetValue(config) is not bool ooc
-                || type.GetField("FollowTarget")?.GetValue(config) is not bool target)
+            if (type.GetField("FollowOutOfCombat")?.GetValue(config) is not bool ooc)
                 return false;
             followOutOfCombat = ooc;
-            followTarget = target;
             return true;
         }
         catch
