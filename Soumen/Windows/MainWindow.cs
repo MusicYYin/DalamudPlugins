@@ -57,7 +57,6 @@ public sealed class MainWindow : Window
     private uint lastSpeedTerritory;
     private float currentSpeed;
     private Vector3 coordinateTeleportDestination;
-    private bool coordinateTeleportInitialized;
     private string coordinateTeleportStatus = string.Empty;
 
     private ThemePalette Theme => GetTheme(configuration.UiTheme);
@@ -782,6 +781,11 @@ public sealed class MainWindow : Window
             DrawToolFrontline(false);
             ImGui.EndTabItem();
         }
+        if (ImGui.BeginTabItem("传送"))
+        {
+            DrawCoordinateTeleport();
+            ImGui.EndTabItem();
+        }
         if (ImGui.BeginTabItem("功能状态检查"))
         {
             DrawToolStatus();
@@ -926,7 +930,6 @@ public sealed class MainWindow : Window
                     value => configuration.ToolMovingCast = value, favoritesOnly))
                 DrawToolSlider("ToolCastWindow", "移动读条窗口", configuration.ToolMovingCastWindow, 0f, 1f, "%.2f s",
                     configuration.ToolMovingCast, value => configuration.ToolMovingCastWindow = value);
-            if (!favoritesOnly) DrawCoordinateTeleport();
         }
 
         if (BeginToolGroup("状态", favoritesOnly,
@@ -1084,12 +1087,6 @@ public sealed class MainWindow : Window
     {
         var scale = ImGuiHelpers.GlobalScale;
         var player = Plugin.ObjectTable.LocalPlayer;
-        if (!coordinateTeleportInitialized && player != null)
-        {
-            coordinateTeleportDestination = player.Position;
-            coordinateTeleportInitialized = true;
-        }
-
         ImGui.Spacing();
         ImGui.TextUnformatted("坐标传送");
         ImGui.TextColored(Muted, "当前地图的世界坐标；Y 为高度。");
@@ -1103,12 +1100,6 @@ public sealed class MainWindow : Window
         ImGui.SetNextItemWidth(width);
         ImGui.InputFloat("Z##CoordinateTeleportZ", ref coordinateTeleportDestination.Z, 0f, 0f, "%.2f");
 
-        if (ImGui.Button("读取当前位置##CoordinateTeleportCurrent") && player != null)
-        {
-            coordinateTeleportDestination = player.Position;
-            coordinateTeleportStatus = string.Empty;
-        }
-        ImGui.SameLine();
         ImGui.BeginDisabled(player == null);
         if (ImGui.Button("传送到坐标##CoordinateTeleportGo"))
             coordinateTeleportService.TryTeleport(coordinateTeleportDestination, out coordinateTeleportStatus);
@@ -1200,6 +1191,8 @@ public sealed class MainWindow : Window
         UpdateSpeed(player?.Position, territory);
         ImGui.TextUnformatted($"当前地图编号：{territory}");
         ImGui.TextUnformatted(player == null ? "自身移动速度：未进入游戏" : $"自身移动速度：{currentSpeed:F2} y/s");
+        ImGui.TextUnformatted(player == null ? "自身当前位置：未进入游戏"
+            : $"自身当前位置：X={player.Position.X:F2}，Y={player.Position.Y:F2}，Z={player.Position.Z:F2}");
 
         ImGui.Spacing();
         if (ImGui.CollapsingHeader("界面", ImGuiTreeNodeFlags.DefaultOpen))
