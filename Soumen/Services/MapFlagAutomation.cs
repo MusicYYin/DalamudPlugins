@@ -69,7 +69,6 @@ public sealed class MapFlagAutomation : IDisposable
     private bool teleportSawLoading;
     private bool partyTeleportSawLoading;
     private bool dungeonFollowByBossMod;
-    private nint dungeonFollowLeaderAddress;
     private int huntTargetInstance;
     private DateTime lastInstanceRequestUtc = DateTime.MinValue;
     private DateTime lastInstanceTeleportUtc = DateTime.MinValue;
@@ -664,12 +663,10 @@ public sealed class MapFlagAutomation : IDisposable
 
         var gap = Vector3.Distance(player.Position, leader.Position);
         var distance = Math.Clamp(configuration.DungeonFollowDistance, 1.5f, 12f);
-        if (externalPlugins.SetDungeonFollow(leader.Name.TextValue, distance))
+        var leaderContentId = group->PartyMembers[(int)group->PartyLeaderIndex].ContentId;
+        if (externalPlugins.SetDungeonFollow(leaderContentId, leader.Name.TextValue, distance))
         {
             dungeonFollowByBossMod = true;
-            dungeonFollowLeaderAddress = leader.Address;
-            if (Plugin.TargetManager.Target?.Address != leader.Address)
-                Plugin.TargetManager.Target = leader;
             externalPlugins.SetNavigating(true);
             StatusText = $"宝物库中 BMR 连续跟随队长 · {gap:F0}y（设定 {distance:F1}y）";
             return;
@@ -684,10 +681,7 @@ public sealed class MapFlagAutomation : IDisposable
         if (dungeonFollowByBossMod)
         {
             externalPlugins.StopDungeonFollow();
-            if (Plugin.TargetManager.Target?.Address == dungeonFollowLeaderAddress)
-                Plugin.TargetManager.Target = null;
             dungeonFollowByBossMod = false;
-            dungeonFollowLeaderAddress = 0;
             externalPlugins.SetNavigating(false);
         }
     }
