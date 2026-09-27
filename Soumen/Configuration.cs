@@ -228,7 +228,7 @@ public sealed class Configuration : IPluginConfiguration
         configuration.StuckSeconds = Math.Clamp(configuration.StuckSeconds, 1f, 30f);
         configuration.ArrivalTolerance = Math.Clamp(configuration.ArrivalTolerance, 0f, 30f);
         configuration.TreasureSpotCorrectionRange = Math.Clamp(configuration.TreasureSpotCorrectionRange, 0f, 150f);
-        configuration.DungeonFollowDistance = Math.Clamp(configuration.DungeonFollowDistance, 1.5f, 12f);
+        configuration.DungeonFollowDistance = Math.Clamp(configuration.DungeonFollowDistance, 0f, 10f);
         configuration.FrontlineRadarRange = Math.Clamp(configuration.FrontlineRadarRange, 20f, 200f);
         configuration.ToolFavorites ??= [];
         configuration.ToolSpeedMultiplier = Math.Clamp(configuration.ToolSpeedMultiplier, 1f, 5f);

@@ -4,6 +4,8 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
+using Dalamud.Utility;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using Soumen.Models;
 using Soumen.Services;
 
@@ -720,7 +722,7 @@ public sealed class MainWindow : Window
         {
             var followDistance = configuration.DungeonFollowDistance;
             ImGui.SetNextItemWidth(240f * ImGuiHelpers.GlobalScale);
-            if (ImGui.SliderFloat("跟随队长距离（y）", ref followDistance, 1.5f, 12f, "%.1f"))
+            if (ImGui.SliderFloat("跟随队长距离（y）", ref followDistance, 0f, 10f, "%.1f"))
             {
                 configuration.DungeonFollowDistance = followDistance;
                 configuration.Save();
@@ -1089,7 +1091,7 @@ public sealed class MainWindow : Window
         var player = Plugin.ObjectTable.LocalPlayer;
         ImGui.Spacing();
         ImGui.TextUnformatted("坐标传送");
-        ImGui.TextColored(Muted, "当前地图的世界坐标；Y 为高度。");
+        ImGui.TextColored(Muted, "输入世界坐标 X、Y、Z（Y 为高度）；地图显示的 X、Y 不是世界坐标。");
         var width = Math.Min(136f * scale, Math.Max(76f * scale, (ImGui.GetContentRegionAvail().X - 18f * scale) / 3f));
         ImGui.SetNextItemWidth(width);
         ImGui.InputFloat("X##CoordinateTeleportX", ref coordinateTeleportDestination.X, 0f, 0f, "%.2f");
@@ -1178,7 +1180,7 @@ public sealed class MainWindow : Window
         ImGui.EndTable();
     }
 
-    private void DrawAbout()
+    private unsafe void DrawAbout()
     {
         ImGui.Spacing();
         DrawSectionTitle($"Soumen {typeof(MainWindow).Assembly.GetName().Version?.ToString(4) ?? "开发版"}");
@@ -1191,8 +1193,22 @@ public sealed class MainWindow : Window
         UpdateSpeed(player?.Position, territory);
         ImGui.TextUnformatted($"当前地图编号：{territory}");
         ImGui.TextUnformatted(player == null ? "自身移动速度：未进入游戏" : $"自身移动速度：{currentSpeed:F2} y/s");
-        ImGui.TextUnformatted(player == null ? "自身当前位置：未进入游戏"
-            : $"自身当前位置：X={player.Position.X:F2}，Y={player.Position.Y:F2}，Z={player.Position.Z:F2}");
+        ImGui.TextUnformatted(player == null ? "自身当前位置（世界坐标）：未进入游戏"
+            : $"自身当前位置（世界坐标）：X={player.Position.X:F2}，Y={player.Position.Y:F2}，Z={player.Position.Z:F2}");
+        if (player != null)
+        {
+            try
+            {
+                var agentMap = AgentMap.Instance();
+                var mapId = agentMap == null ? 0u : agentMap->CurrentMapId;
+                if (mapId != 0 && Plugin.DataManager.GetExcelSheet<Lumina.Excel.Sheets.Map>().TryGetRow(mapId, out var map))
+                {
+                    var position = MapUtil.WorldToMap(new Vector2(player.Position.X, player.Position.Z), map);
+                    ImGui.TextUnformatted($"自身当前位置（地图坐标）：X={position.X:F1}，Y={position.Y:F1}");
+                }
+            }
+            catch { /* The map may be unavailable while transitioning between areas. */ }
+        }
 
         ImGui.Spacing();
         if (ImGui.CollapsingHeader("界面", ImGuiTreeNodeFlags.DefaultOpen))
