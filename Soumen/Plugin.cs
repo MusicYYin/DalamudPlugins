@@ -51,6 +51,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly ToolVerticalService toolVerticalService;
     private readonly ToolMovingCastService toolMovingCastService;
     private readonly ToolCastRecastService toolCastRecastService;
+    private readonly CoordinateTeleportService coordinateTeleportService;
     private readonly MainWindow mainWindow;
     private DateTime lastToolHealthUtc;
 
@@ -76,8 +77,9 @@ public sealed class Plugin : IDalamudPlugin
         toolVerticalService = new ToolVerticalService(configuration, diagnostics);
         toolMovingCastService = new ToolMovingCastService(configuration, diagnostics);
         toolCastRecastService = new ToolCastRecastService(configuration, diagnostics);
+        coordinateTeleportService = new CoordinateTeleportService(diagnostics);
         mainWindow = new MainWindow(configuration, automation, leaderTreasureAutomation, autoDiscardService,
-            statisticsService, diagnostics, huntAutomation, toolAvailabilityService.Check);
+            statisticsService, diagnostics, huntAutomation, toolAvailabilityService.Check, coordinateTeleportService);
         windowSystem.AddWindow(mainWindow);
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
