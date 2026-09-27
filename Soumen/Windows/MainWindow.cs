@@ -33,6 +33,7 @@ public sealed class MainWindow : Window
     private readonly DiagnosticLogger diagnostics;
     private readonly HuntAutomation huntAutomation;
     private readonly Func<string, ToolEntryStatus> checkToolEntry;
+    private readonly CoordinateTeleportService coordinateTeleportService;
     private readonly ISharedImmediateTexture treasureIcon;
     private readonly ISharedImmediateTexture huntIcon;
     private readonly ISharedImmediateTexture toolsIcon;
@@ -55,6 +56,9 @@ public sealed class MainWindow : Window
     private DateTime lastSpeedSampleUtc = DateTime.MinValue;
     private uint lastSpeedTerritory;
     private float currentSpeed;
+    private Vector3 coordinateTeleportDestination;
+    private bool coordinateTeleportInitialized;
+    private string coordinateTeleportStatus = string.Empty;
 
     private ThemePalette Theme => GetTheme(configuration.UiTheme);
     private Vector4 Accent => Theme.Accent;
@@ -70,7 +74,8 @@ public sealed class MainWindow : Window
         StatisticsService statisticsService,
         DiagnosticLogger diagnostics,
         HuntAutomation huntAutomation,
-        Func<string, ToolEntryStatus> checkToolEntry)
+        Func<string, ToolEntryStatus> checkToolEntry,
+        CoordinateTeleportService coordinateTeleportService)
         : base("Soumen##SoumenMain")
     {
         this.configuration = configuration;
@@ -81,6 +86,7 @@ public sealed class MainWindow : Window
         this.diagnostics = diagnostics;
         this.huntAutomation = huntAutomation;
         this.checkToolEntry = checkToolEntry;
+        this.coordinateTeleportService = coordinateTeleportService;
         treasureIcon = Plugin.TextureProvider.GetFromManifestResource(
             typeof(MainWindow).Assembly, "Soumen.Assets.treasure-chest.jpg");
         huntIcon = Plugin.TextureProvider.GetFromManifestResource(
@@ -920,6 +926,7 @@ public sealed class MainWindow : Window
                     value => configuration.ToolMovingCast = value, favoritesOnly))
                 DrawToolSlider("ToolCastWindow", "移动读条窗口", configuration.ToolMovingCastWindow, 0f, 1f, "%.2f s",
                     configuration.ToolMovingCast, value => configuration.ToolMovingCastWindow = value);
+            if (!favoritesOnly) DrawCoordinateTeleport();
         }
 
         if (BeginToolGroup("状态", favoritesOnly,
@@ -1071,6 +1078,43 @@ public sealed class MainWindow : Window
         }
         ImGui.EndDisabled();
         ImGui.Unindent(22f * ImGuiHelpers.GlobalScale);
+    }
+
+    private void DrawCoordinateTeleport()
+    {
+        var scale = ImGuiHelpers.GlobalScale;
+        var player = Plugin.ObjectTable.LocalPlayer;
+        if (!coordinateTeleportInitialized && player != null)
+        {
+            coordinateTeleportDestination = player.Position;
+            coordinateTeleportInitialized = true;
+        }
+
+        ImGui.Spacing();
+        ImGui.TextUnformatted("坐标传送");
+        ImGui.TextColored(Muted, "当前地图的世界坐标；Y 为高度。");
+        var width = Math.Min(136f * scale, Math.Max(76f * scale, (ImGui.GetContentRegionAvail().X - 18f * scale) / 3f));
+        ImGui.SetNextItemWidth(width);
+        ImGui.InputFloat("X##CoordinateTeleportX", ref coordinateTeleportDestination.X, 0f, 0f, "%.2f");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(width);
+        ImGui.InputFloat("Y##CoordinateTeleportY", ref coordinateTeleportDestination.Y, 0f, 0f, "%.2f");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(width);
+        ImGui.InputFloat("Z##CoordinateTeleportZ", ref coordinateTeleportDestination.Z, 0f, 0f, "%.2f");
+
+        if (ImGui.Button("读取当前位置##CoordinateTeleportCurrent") && player != null)
+        {
+            coordinateTeleportDestination = player.Position;
+            coordinateTeleportStatus = string.Empty;
+        }
+        ImGui.SameLine();
+        ImGui.BeginDisabled(player == null);
+        if (ImGui.Button("传送到坐标##CoordinateTeleportGo"))
+            coordinateTeleportService.TryTeleport(coordinateTeleportDestination, out coordinateTeleportStatus);
+        ImGui.EndDisabled();
+        if (!string.IsNullOrWhiteSpace(coordinateTeleportStatus))
+            ImGui.TextColored(Muted, coordinateTeleportStatus);
     }
 
     private void DrawToolStatus()
