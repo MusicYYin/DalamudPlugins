@@ -124,6 +124,7 @@ internal sealed unsafe class ToolFishingService : IDisposable
     private Hook<GetResourceAsyncDelegate>? asyncHook;
 
     private volatile bool interceptActive;
+    private volatile bool interceptGathering;
     private bool failed;
     private int intercepted;
 
@@ -139,6 +140,7 @@ internal sealed unsafe class ToolFishingService : IDisposable
     {
         Plugin.Framework.Update -= OnFrameworkUpdate;
         interceptActive = false;
+        interceptGathering = false;
         asyncHook?.Dispose();
         syncHook?.Dispose();
         if (nothingHandle.IsAllocated) nothingHandle.Free();
@@ -150,11 +152,15 @@ internal sealed unsafe class ToolFishingService : IDisposable
         interceptActive = configuration.CancelFishingAnimation
             && Plugin.ObjectTable.LocalPlayer?.ClassJob.RowId == 18
             && Plugin.Condition[ConditionFlag.Gathering];
-        if (!configuration.CancelFishingAnimation || failed) return;
+        var job = Plugin.ObjectTable.LocalPlayer?.ClassJob.RowId;
+        interceptGathering = configuration.CancelGatheringAnimation && (job is 16 or 17)
+            && Plugin.Condition[ConditionFlag.Gathering];
+        if ((!configuration.CancelFishingAnimation && !configuration.CancelGatheringAnimation) || failed) return;
 
         if (ExternalHookGuard.Blocks("AutoCancelFSHAnimationHook", true, diagnostics))
         {
             interceptActive = false;
+            interceptGathering = false;
             if (syncHook?.IsEnabled == true) syncHook.Disable();
             if (asyncHook?.IsEnabled == true) asyncHook.Disable();
             return;
@@ -171,7 +177,7 @@ internal sealed unsafe class ToolFishingService : IDisposable
                 asyncHook = Plugin.GameInteropProvider.HookFromAddress<GetResourceAsyncDelegate>(asyncAddress, GetAsync);
                 syncHook.Enable();
                 asyncHook.Enable();
-                diagnostics.Write("工具 Hook", "取消钓鱼动画资源入口已接管。");
+                diagnostics.Write("工具 Hook", "钓鱼与采集动画资源入口已接管。");
             }
             catch (Exception exception)
             {
@@ -181,7 +187,7 @@ internal sealed unsafe class ToolFishingService : IDisposable
                 syncHook?.Dispose();
                 asyncHook = null;
                 syncHook = null;
-                diagnostics.Write("工具 Hook", $"取消钓鱼动画安装失败：{exception.GetType().Name}。");
+                diagnostics.Write("工具 Hook", $"钓鱼与采集动画安装失败：{exception.GetType().Name}。");
                 Plugin.Log.Error(exception, "Fishing resource hooks failed");
             }
         }
@@ -193,14 +199,16 @@ internal sealed unsafe class ToolFishingService : IDisposable
 
         var count = Interlocked.Exchange(ref intercepted, 0);
         if (count > 0)
-            diagnostics.WriteThrottled("soumen-tools-fishing", "取消钓鱼动画", $"已改写 {count} 个钓鱼动画资源请求。", TimeSpan.FromSeconds(10));
+            diagnostics.WriteThrottled("soumen-tools-gathering", "采集动画", $"已改写 {count} 个动画资源请求。", TimeSpan.FromSeconds(10));
     }
 
     private byte* SelectPath(byte* path)
     {
-        if (!interceptActive || path == null) return path;
+        if ((!interceptActive && !interceptGathering) || path == null) return path;
         var text = Marshal.PtrToStringAnsi((nint)path);
-        if (text == null || !FishingAnimations.Contains(text)) return path;
+        if (text == null || !(interceptActive && FishingAnimations.Contains(text))
+            && !(interceptGathering && text.StartsWith("chara/action/", StringComparison.OrdinalIgnoreCase)
+                && text.EndsWith(".tmb", StringComparison.OrdinalIgnoreCase))) return path;
         Interlocked.Increment(ref intercepted);
         return (byte*)nothingHandle.AddrOfPinnedObject();
     }

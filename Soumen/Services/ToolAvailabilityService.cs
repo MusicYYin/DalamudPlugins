@@ -27,6 +27,7 @@ internal sealed class ToolAvailabilityService
         (nameof(Configuration.NoBackswingMovement), "NoBackswingHook", ["_NoBackswingHook"]),
         (nameof(Configuration.ToolNoActionMove), "NoActionMoveHook", ["_NoActionMoveHook"]),
         (nameof(Configuration.CancelFishingAnimation), "AutoCancelFSHAnimationHook", ["_getResourceSyncHook", "_getResourceAsyncHook"]),
+        (nameof(Configuration.CancelGatheringAnimation), "AutoCancelFSHAnimationHook", ["_getResourceSyncHook", "_getResourceAsyncHook"]),
     ];
 
     private readonly Dictionary<string, ToolEntryStatus> snapshot = new(StringComparer.Ordinal);

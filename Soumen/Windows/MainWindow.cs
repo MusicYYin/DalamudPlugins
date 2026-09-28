@@ -60,6 +60,8 @@ public sealed class MainWindow : Window
     private float currentSpeed;
     private Vector3 coordinateTeleportDestination;
     private string coordinateTeleportStatus = string.Empty;
+    private Vector3 diveTeleportDestination;
+    private string diveTeleportStatus = string.Empty;
     private string directionalTeleportStatus = string.Empty;
 
     private ThemePalette Theme => GetTheme(configuration.UiTheme);
@@ -832,7 +834,7 @@ public sealed class MainWindow : Window
             configuration.ToolStatusBlock, configuration.ToolActionRangeEnabled, configuration.ToolTargetRadiusEnabled,
             configuration.NoBackswingMovement, configuration.ToolNoActionMove, configuration.ToolRecastReduction,
             configuration.ToolRecastReduction && configuration.ToolRapidMudra, configuration.ToolCastReduction,
-            configuration.CancelFishingAnimation, configuration.FrontlineRadarEnabled,
+            configuration.CancelFishingAnimation, configuration.CancelGatheringAnimation, configuration.FrontlineRadarEnabled,
         }.Count(enabled => enabled);
 
     private void DrawActiveToolFeatures()
@@ -858,7 +860,8 @@ public sealed class MainWindow : Window
             ("复唱缩减", nameof(configuration.ToolRecastReduction), configuration.ToolRecastReduction, () => configuration.ToolRecastReduction = false),
             ("快速结印（忍者）", nameof(configuration.ToolRapidMudra), configuration.ToolRecastReduction && configuration.ToolRapidMudra, () => configuration.ToolRapidMudra = false),
             ("咏唱缩减", nameof(configuration.ToolCastReduction), configuration.ToolCastReduction, () => configuration.ToolCastReduction = false),
-            ("取消钓鱼动画", nameof(configuration.CancelFishingAnimation), configuration.CancelFishingAnimation, () => configuration.CancelFishingAnimation = false),
+            ("取消钓鱼后摇", nameof(configuration.CancelFishingAnimation), configuration.CancelFishingAnimation, () => configuration.CancelFishingAnimation = false),
+            ("取消采集后摇", nameof(configuration.CancelGatheringAnimation), configuration.CancelGatheringAnimation, () => configuration.CancelGatheringAnimation = false),
             ("战场透视", nameof(configuration.FrontlineRadarEnabled), configuration.FrontlineRadarEnabled, () => configuration.FrontlineRadarEnabled = false),
         };
         if (!features.Any(feature => feature.Enabled))
@@ -997,9 +1000,12 @@ public sealed class MainWindow : Window
 
     private void DrawToolConvenience(bool favoritesOnly)
     {
-        if (!BeginToolGroup("钓鱼", favoritesOnly, nameof(configuration.CancelFishingAnimation))) return;
-        DrawToolToggle("取消钓鱼动画", nameof(configuration.CancelFishingAnimation),
+        if (!BeginToolGroup("钓鱼与采集", favoritesOnly,
+                nameof(configuration.CancelFishingAnimation), nameof(configuration.CancelGatheringAnimation))) return;
+        DrawToolToggle("取消钓鱼后摇", nameof(configuration.CancelFishingAnimation),
             configuration.CancelFishingAnimation, value => configuration.CancelFishingAnimation = value, favoritesOnly);
+        DrawToolToggle("取消采集后摇", nameof(configuration.CancelGatheringAnimation),
+            configuration.CancelGatheringAnimation, value => configuration.CancelGatheringAnimation = value, favoritesOnly);
     }
 
     private void DrawToolFrontline(bool favoritesOnly)
@@ -1092,7 +1098,6 @@ public sealed class MainWindow : Window
         var player = Plugin.ObjectTable.LocalPlayer;
         ImGui.Spacing();
         ImGui.TextUnformatted("坐标传送");
-        ImGui.TextColored(Muted, "输入世界坐标 X、Y、Z（Y 为高度）；地图显示的 X、Y 不是世界坐标。");
         var width = Math.Min(136f * scale, Math.Max(76f * scale, (ImGui.GetContentRegionAvail().X - 18f * scale) / 3f));
         ImGui.SetNextItemWidth(width);
         ImGui.InputFloat("X##CoordinateTeleportX", ref coordinateTeleportDestination.X, 0f, 0f, "%.2f");
@@ -1111,10 +1116,8 @@ public sealed class MainWindow : Window
             ImGui.TextColored(Muted, coordinateTeleportStatus);
 
         ImGui.Spacing();
-        ImGui.Spacing();
-        ImGui.PushStyleColor(ImGuiCol.Text, Accent);
+        ImGui.Separator();
         ImGui.TextUnformatted("方向传送");
-        ImGui.PopStyleColor();
         ImGui.SameLine(0f, 14f * scale);
         ImGui.SetNextItemWidth(96f * scale);
         var distance = configuration.DirectionalTeleportDistance;
@@ -1124,30 +1127,65 @@ public sealed class MainWindow : Window
                 ? Math.Clamp(distance, 0.1f, 100f) : 5f;
             configuration.Save();
         }
-        ImGui.Separator();
-        ImGui.TextColored(Muted, "前后左右按角色朝向计算，上下改变高度；每点一次移动设定的距离。");
         ImGui.BeginDisabled(player == null);
-        if (ImGui.BeginTable("##DirectionalTeleportButtons", 3, ImGuiTableFlags.SizingFixedFit))
+        if (ImGui.BeginTable("##DirectionalTeleportButtons", 4, ImGuiTableFlags.SizingFixedFit))
         {
+            ImGui.TableSetupColumn("##DPadLeft", ImGuiTableColumnFlags.WidthFixed, 68f * scale);
+            ImGui.TableSetupColumn("##DPadMiddle", ImGuiTableColumnFlags.WidthFixed, 68f * scale);
+            ImGui.TableSetupColumn("##DPadRight", ImGuiTableColumnFlags.WidthFixed, 68f * scale);
+            ImGui.TableSetupColumn("##DPadHeight", ImGuiTableColumnFlags.WidthFixed, 82f * scale);
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn();
             DrawDirectionalTeleportButton("↑ 前", TeleportDirection.Forward);
-            DrawDirectionalTeleportButton("↓ 后", TeleportDirection.Backward);
-            DrawDirectionalTeleportButton("▲ 上", TeleportDirection.Up);
+            ImGui.TableNextColumn();
+            DrawDirectionalTeleportButton("⇧ 上", TeleportDirection.Up, true);
+            ImGui.TableNextRow();
             DrawDirectionalTeleportButton("← 左", TeleportDirection.Left);
+            ImGui.TableNextColumn();
+            ImGui.PushStyleColor(ImGuiCol.Text, Muted);
+            ImGui.TextUnformatted("  ●");
+            ImGui.PopStyleColor();
             DrawDirectionalTeleportButton("→ 右", TeleportDirection.Right);
-            DrawDirectionalTeleportButton("▼ 下", TeleportDirection.Down);
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn();
+            DrawDirectionalTeleportButton("↓ 后", TeleportDirection.Backward);
+            ImGui.TableNextColumn();
+            DrawDirectionalTeleportButton("⇩ 下", TeleportDirection.Down, true);
             ImGui.EndTable();
         }
         ImGui.EndDisabled();
         if (!string.IsNullOrWhiteSpace(directionalTeleportStatus))
             ImGui.TextColored(Muted, directionalTeleportStatus);
+
+        ImGui.Spacing();
+        ImGui.Separator();
+        ImGui.TextUnformatted("潜水传送");
+        ImGui.SetNextItemWidth(width);
+        ImGui.InputFloat("X##DiveTeleportX", ref diveTeleportDestination.X, 0f, 0f, "%.2f");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(width);
+        ImGui.InputFloat("Y##DiveTeleportY", ref diveTeleportDestination.Y, 0f, 0f, "%.2f");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(width);
+        ImGui.InputFloat("Z##DiveTeleportZ", ref diveTeleportDestination.Z, 0f, 0f, "%.2f");
+        ImGui.BeginDisabled(player == null);
+        if (ImGui.Button("潜水传送##DiveTeleportGo"))
+            coordinateTeleportService.TryDiveTeleport(diveTeleportDestination, out diveTeleportStatus);
+        ImGui.EndDisabled();
+        if (!string.IsNullOrWhiteSpace(diveTeleportStatus))
+            ImGui.TextColored(Muted, diveTeleportStatus);
     }
 
-    private void DrawDirectionalTeleportButton(string label, TeleportDirection direction)
+    private void DrawDirectionalTeleportButton(string label, TeleportDirection direction, bool vertical = false)
     {
         ImGui.TableNextColumn();
-        if (ImGui.Button($"{label}##Teleport{direction}", new Vector2(86f, 34f) * ImGuiHelpers.GlobalScale))
+        if (vertical)
+            ImGui.PushStyleColor(ImGuiCol.Button, AccentSoft);
+        if (ImGui.Button($"{label}##Teleport{direction}", new Vector2(vertical ? 76f : 62f, 38f) * ImGuiHelpers.GlobalScale))
             coordinateTeleportService.TryTeleportInDirection(direction, configuration.DirectionalTeleportDistance,
                 out directionalTeleportStatus);
+        if (vertical)
+            ImGui.PopStyleColor();
     }
 
     private void DrawToolStatus()
@@ -1182,7 +1220,8 @@ public sealed class MainWindow : Window
             ("咏唱缩减", nameof(configuration.ToolCastReduction)),
         ]);
         DrawToolStatusGroup("其他与战场", [
-            ("取消钓鱼动画", nameof(configuration.CancelFishingAnimation)),
+            ("取消钓鱼后摇", nameof(configuration.CancelFishingAnimation)),
+            ("取消采集后摇", nameof(configuration.CancelGatheringAnimation)),
             ("战场透视", nameof(configuration.FrontlineRadarEnabled)),
         ]);
     }
