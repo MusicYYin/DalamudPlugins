@@ -3,7 +3,6 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
-using Lumina.Excel.Sheets;
 using NativeBattleChara = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 
 namespace Soumen.Services;
@@ -11,7 +10,10 @@ namespace Soumen.Services;
 /// <summary>Shows loaded hostile players through world geometry in PvP areas.</summary>
 public sealed class FrontlineRadarService : IDisposable
 {
-    private static readonly Vector4 EnemyColor = new(1f, 0.31f, 0.35f, 1f);
+    // The three Frontline teams are encoded as 0/1/2 in the loaded battle characters.
+    private static readonly Vector4 MaelstromColor = new(1f, 0.36f, 0.40f, 1f);
+    private static readonly Vector4 AdderColor = new(1f, 0.89f, 0.36f, 1f);
+    private static readonly Vector4 FlamesColor = new(0.47f, 0.73f, 1f, 1f);
     private readonly Configuration configuration;
     private readonly DiagnosticLogger diagnostics;
 
@@ -47,7 +49,6 @@ public sealed class FrontlineRadarService : IDisposable
         var localBattalion = ((NativeBattleChara*)local.Address)->Battalion;
         var maxDistanceSquared = configuration.FrontlineRadarRange * configuration.FrontlineRadarRange;
         var scale = ImGuiHelpers.GlobalScale;
-        var color = ImGui.ColorConvertFloat4ToU32(EnemyColor);
         var drawList = ImGui.GetBackgroundDrawList();
         var lineStart = new Vector2(ImGui.GetIO().DisplaySize.X * 0.5f, ImGui.GetIO().DisplaySize.Y * 0.85f);
         var inspected = 0;
@@ -74,27 +75,19 @@ public sealed class FrontlineRadarService : IDisposable
             if (!Plugin.GameGui.WorldToScreen(player.Position + new Vector3(0f, 1.8f, 0f), out var screen))
                 continue;
 
-            drawList.AddCircleFilled(screen, 5f * scale, color);
-            var label = screen + new Vector2(9f, -8f) * scale;
+            var color = ImGui.ColorConvertFloat4ToU32(native->Battalion switch
+            {
+                0 => MaelstromColor,
+                1 => AdderColor,
+                2 => FlamesColor,
+                _ => MaelstromColor,
+            });
+            var label = screen + new Vector2(0f, -8f) * scale;
             if (configuration.FrontlineRadarJobIcons)
             {
                 var jobId = player.ClassJob.RowId;
                 if (jobId != 0)
                     label = DrawIcon(drawList, label, 62100u + jobId, scale);
-            }
-            if (configuration.FrontlineRadarBattleHighIcons)
-            {
-                var sheet = Plugin.DataManager.GetExcelSheet<Status>();
-                foreach (var effect in player.StatusList)
-                {
-                    if (sheet == null || !sheet.TryGetRow(effect.StatusId, out var status)) continue;
-                    var name = status.Name.ToString();
-                    if (!name.Contains("Battle High", StringComparison.OrdinalIgnoreCase)
-                        && !name.Contains("战意", StringComparison.Ordinal)
-                        && !name.Contains("戰意", StringComparison.Ordinal)) continue;
-                    label = DrawIcon(drawList, label, status.Icon, scale);
-                    break;
-                }
             }
             drawList.AddText(label, color, player.Name.TextValue);
             if (configuration.FrontlineRadarLines)
