@@ -114,8 +114,6 @@ public sealed class Configuration : IPluginConfiguration
 
     public float DirectionalTeleportDistance { get; set; } = 5f;
 
-    public bool DiveTeleportCancelRiseAnimation { get; set; } = false;
-
     public bool ToolActionRangeEnabled { get; set; } = false;
 
     public float ToolActionRangeBonus { get; set; } = 2f;
@@ -236,6 +234,7 @@ public sealed class Configuration : IPluginConfiguration
         configuration.TreasureSpotCorrectionRange = Math.Clamp(configuration.TreasureSpotCorrectionRange, 0f, 150f);
         configuration.DungeonFollowDistance = Math.Clamp(configuration.DungeonFollowDistance, 0f, 10f);
         configuration.FrontlineRadarRange = Math.Clamp(configuration.FrontlineRadarRange, 20f, 200f);
+        configuration.PreviousSettings?.Remove("DiveTeleportCancelRiseAnimation");
         configuration.ToolFavorites ??= [];
         configuration.ToolSpeedMultiplier = Math.Clamp(configuration.ToolSpeedMultiplier, 1f, 5f);
         configuration.ToolActionRangeBonus = Math.Clamp(configuration.ToolActionRangeBonus, 0f, 3f);

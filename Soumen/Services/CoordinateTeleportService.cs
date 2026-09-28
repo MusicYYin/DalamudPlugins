@@ -1,11 +1,7 @@
 using System.Numerics;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Dalamud;
 using Dalamud.Game.ClientState.Conditions;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace Soumen.Services;
@@ -23,27 +19,6 @@ internal enum TeleportDirection
 /// <summary>One-shot, same-territory teleport using the client's GameObject position function.</summary>
 internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnostics)
 {
-    // The optional rise-animation shortcut sends a movement update before DiveEnd.
-    // Changing GameObject.Position alone only changes the local copy of the position.
-    private const string NormalPositionOpcode = "41 B8 ?? ?? ?? ?? F6 C2";
-    private const string SendPositionPacketCall = "E8 ?? ?? ?? ?? 48 8B D6 48 8B CF E8 ?? ?? ?? ?? 48 8B 8C 24";
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate nint SendPositionPacketDelegate(nint networkModuleProxy, byte* packet, uint a3, uint a4);
-
-    [StructLayout(LayoutKind.Explicit, Size = 52)]
-    private struct PositionUpdatePacket
-    {
-        [FieldOffset(0)] public uint Opcode;
-        [FieldOffset(8)] public uint Length;
-        [FieldOffset(32)] public float Rotation;
-        [FieldOffset(36)] public uint Move;
-        [FieldOffset(40)] public Vector3 Position;
-    }
-
-    private static SendPositionPacketDelegate? sendPositionPacket;
-    private static uint positionOpcode;
-
     public bool TryTeleportInDirection(TeleportDirection direction, float distance, out string status)
     {
         if (!float.IsFinite(distance) || distance < 0.1f || distance > 100f)
@@ -81,7 +56,7 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
         return TryTeleport(player.Position + offset * distance, out status);
     }
 
-    public bool TryDiveTeleportToFlag(bool cancelRiseAnimation, out Vector3 destination, out string status)
+    public bool TryDiveTeleportToFlag(out Vector3 destination, out string status)
     {
         destination = default;
         var player = Plugin.ObjectTable.LocalPlayer;
@@ -100,10 +75,10 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
         }
 
         destination = new Vector3(flag.XFloat, player.Position.Y, flag.YFloat);
-        return TryDiveTeleport(destination, cancelRiseAnimation, out status);
+        return TryDiveTeleport(destination, out status);
     }
 
-    public bool TryDiveTeleport(Vector3 destination, bool cancelRiseAnimation, out string status)
+    public bool TryDiveTeleport(Vector3 destination, out string status)
     {
         if (!IsValidDestination(destination))
         {
@@ -127,20 +102,8 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
             return false;
         }
 
-        var originalPosition = player.Position;
         try
         {
-            if (cancelRiseAnimation)
-            {
-                if (!TrySendLoweredPosition(player.Rotation, originalPosition, out var error))
-                {
-                    status = $"无法取消浮起动画：{error}";
-                    diagnostics.Write("工具传送", status);
-                    return false;
-                }
-                diagnostics.Write("工具传送", $"浮起动画位置更新已发送：原始 Y={originalPosition.Y:F2}，上报 Y={originalPosition.Y - 100f:F2}。");
-            }
-
             // Neko's TPDive calls the game's location command 607 (DiveEnd) with the
             // destination, packet-encoded player rotation and the mounted correction flag.
             // It is sent from the ground as well; it is not a write to the current dive position.
@@ -156,7 +119,7 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
 
             status = string.Empty;
             diagnostics.Write("工具传送", $"潜水传送已发送：地图={Plugin.ClientState.TerritoryType}，"
-                + $"X={destination.X:F2}，Y={destination.Y:F2}，Z={destination.Z:F2}；取消浮起动画={cancelRiseAnimation}。");
+                + $"X={destination.X:F2}，Y={destination.Y:F2}，Z={destination.Z:F2}。");
             return true;
         }
         catch (Exception exception)
@@ -165,67 +128,6 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
             diagnostics.WriteException("工具传送", "潜水传送命令", exception);
             return false;
         }
-    }
-
-    private static bool TrySendLoweredPosition(float rotation, Vector3 originalPosition, out string error)
-    {
-        using var process = Process.GetCurrentProcess();
-        var gameModule = process.MainModule;
-        if (gameModule == null || gameModule.ModuleMemorySize != 0x380A000)
-        {
-            error = "游戏客户端版本与已验证的移动包入口不一致";
-            return false;
-        }
-
-        if (sendPositionPacket == null)
-        {
-            var opcodeAddress = Plugin.SigScanner.ScanText(NormalPositionOpcode);
-            if (!SafeMemory.Read<uint>(opcodeAddress + 2, out var opcode) || opcode is 0 or > ushort.MaxValue)
-            {
-                error = "无法读取当前位置更新包编号";
-                return false;
-            }
-
-            // For a signature starting with E8, Dalamud's ScanText already resolves
-            // the call and returns its actual target. Do not decode a second rel32.
-            var target = Plugin.SigScanner.ScanText(SendPositionPacketCall);
-            if (target < gameModule.BaseAddress
-                || target - gameModule.BaseAddress >= gameModule.ModuleMemorySize)
-            {
-                error = "移动包发送入口不属于当前游戏客户端";
-                return false;
-            }
-
-            sendPositionPacket = Marshal.GetDelegateForFunctionPointer<SendPositionPacketDelegate>(target);
-            positionOpcode = opcode;
-        }
-
-        var framework = Framework.Instance();
-        var networkModuleProxy = framework == null ? null : framework->NetworkModuleProxy;
-        if (networkModuleProxy == null)
-        {
-            error = "游戏网络模块未就绪";
-            return false;
-        }
-
-        var lowered = new Vector3(originalPosition.X, originalPosition.Y - 100f, originalPosition.Z);
-        // The movement update has four variants. Send all of them as the original
-        // packet helper does, before submitting the DiveEnd location command.
-        for (uint variant = 0; variant < 4; variant++)
-        {
-            var packet = new PositionUpdatePacket
-            {
-                Opcode = positionOpcode,
-                Length = 40,
-                Rotation = rotation,
-                Move = variant << 16,
-                Position = lowered,
-            };
-            sendPositionPacket((nint)networkModuleProxy, (byte*)&packet, 0, 0x9876543);
-        }
-
-        error = string.Empty;
-        return true;
     }
 
     public bool TryTeleport(Vector3 destination, out string status)
