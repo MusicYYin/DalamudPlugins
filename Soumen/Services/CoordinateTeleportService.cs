@@ -2,6 +2,7 @@ using System.Numerics;
 using Dalamud.Game.ClientState.Conditions;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace Soumen.Services;
 
@@ -55,7 +56,29 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
         return TryTeleport(player.Position + offset * distance, out status);
     }
 
-    public bool TryDiveTeleport(Vector3 destination, out string status)
+    public bool TryDiveTeleportToFlag(bool cancelRiseAnimation, out Vector3 destination, out string status)
+    {
+        destination = default;
+        var player = Plugin.ObjectTable.LocalPlayer;
+        var map = AgentMap.Instance();
+        if (player == null || map == null || map->FlagMarkerCount == 0)
+        {
+            status = "请先在当前地图设置旗标。";
+            return false;
+        }
+
+        var flag = map->FlagMapMarkers[0];
+        if (flag.TerritoryId != Plugin.ClientState.TerritoryType || flag.MapId == 0)
+        {
+            status = "旗标不在当前地图，无法传送。";
+            return false;
+        }
+
+        destination = new Vector3(flag.XFloat, player.Position.Y, flag.YFloat);
+        return TryDiveTeleport(destination, cancelRiseAnimation, out status);
+    }
+
+    public bool TryDiveTeleport(Vector3 destination, bool cancelRiseAnimation, out string status)
     {
         if (!IsValidDestination(destination))
         {
@@ -79,8 +102,20 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
             return false;
         }
 
+        GameObject* gameObject = null;
+        var originalPosition = player.Position;
+        var loweredForAnimation = false;
         try
         {
+            if (cancelRiseAnimation)
+            {
+                // Neko's optional animation path lowers the local character by 100 y
+                // immediately before submitting the DiveEnd location command.
+                gameObject = (GameObject*)player.Address;
+                gameObject->SetPosition(originalPosition.X, originalPosition.Y - 100f, originalPosition.Z);
+                loweredForAnimation = true;
+            }
+
             // Neko's TPDive calls the game's location command 607 (DiveEnd) with the
             // destination, packet-encoded player rotation and the mounted correction flag.
             // It is sent from the ground as well; it is not a write to the current dive position.
@@ -89,6 +124,8 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
             var mountedCorrection = Plugin.Condition[ConditionFlag.Mounted] ? 1 : 0;
             if (!GameMain.ExecuteLocationCommand(607, &destination, rotation, mountedCorrection))
             {
+                if (loweredForAnimation)
+                    gameObject->SetPosition(originalPosition.X, originalPosition.Y, originalPosition.Z);
                 status = "客户端未接受潜水传送请求。";
                 diagnostics.Write("工具传送", status);
                 return false;
@@ -96,11 +133,16 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
 
             status = string.Empty;
             diagnostics.Write("工具传送", $"潜水传送已发送：地图={Plugin.ClientState.TerritoryType}，"
-                + $"X={destination.X:F2}，Y={destination.Y:F2}，Z={destination.Z:F2}。");
+                + $"X={destination.X:F2}，Y={destination.Y:F2}，Z={destination.Z:F2}；取消浮起动画={cancelRiseAnimation}。");
             return true;
         }
         catch (Exception exception)
         {
+            if (loweredForAnimation && gameObject != null)
+            {
+                try { gameObject->SetPosition(originalPosition.X, originalPosition.Y, originalPosition.Z); }
+                catch { /* Keep the original failure as the diagnostic reason. */ }
+            }
             status = $"潜水传送失败：{exception.GetType().Name}。";
             diagnostics.WriteException("工具传送", "潜水传送命令", exception);
             return false;

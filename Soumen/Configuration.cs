@@ -114,6 +114,8 @@ public sealed class Configuration : IPluginConfiguration
 
     public float DirectionalTeleportDistance { get; set; } = 5f;
 
+    public bool DiveTeleportCancelRiseAnimation { get; set; } = false;
+
     public bool ToolActionRangeEnabled { get; set; } = false;
 
     public float ToolActionRangeBonus { get; set; } = 2f;

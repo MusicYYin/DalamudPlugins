@@ -1141,7 +1141,7 @@ public sealed class MainWindow : Window
             ImGui.TableNextColumn();
             DrawDirectionalTeleportButton("↑ 前", TeleportDirection.Forward);
             ImGui.TableNextColumn();
-            DrawDirectionalTeleportButton("⇧ 上", TeleportDirection.Up, true);
+            DrawDirectionalTeleportButton("▲ 上", TeleportDirection.Up, true);
             ImGui.TableNextRow();
             DrawDirectionalTeleportButton("← 左", TeleportDirection.Left);
             ImGui.TableNextColumn();
@@ -1150,7 +1150,7 @@ public sealed class MainWindow : Window
             ImGui.TableNextColumn();
             DrawDirectionalTeleportButton("↓ 后", TeleportDirection.Backward);
             ImGui.TableNextColumn();
-            DrawDirectionalTeleportButton("⇩ 下", TeleportDirection.Down, true);
+            DrawDirectionalTeleportButton("▼ 下", TeleportDirection.Down, true);
             ImGui.EndTable();
         }
         ImGui.EndDisabled();
@@ -1160,6 +1160,10 @@ public sealed class MainWindow : Window
         ImGui.Spacing();
         ImGui.Separator();
         ImGui.TextUnformatted("潜水传送");
+        ImGui.SameLine(0f, 14f * scale);
+        DrawCheckbox("取消浮起动画", nameof(configuration.DiveTeleportCancelRiseAnimation),
+            configuration.DiveTeleportCancelRiseAnimation,
+            value => configuration.DiveTeleportCancelRiseAnimation = value);
         ImGui.SetNextItemWidth(width);
         ImGui.InputFloat("X##DiveTeleportX", ref diveTeleportDestination.X, 0f, 0f, "%.2f");
         ImGui.SameLine();
@@ -1171,8 +1175,19 @@ public sealed class MainWindow : Window
         ImGui.BeginDisabled(player == null);
         if (ImGui.Button("潜水传送##DiveTeleportGo"))
         {
-            if (coordinateTeleportService.TryDiveTeleport(diveTeleportDestination, out diveTeleportStatus))
+            if (coordinateTeleportService.TryDiveTeleport(diveTeleportDestination,
+                    configuration.DiveTeleportCancelRiseAnimation, out diveTeleportStatus))
                 diveTeleportStatus = string.Empty;
+        }
+        ImGui.SameLine(0f, 10f * scale);
+        if (ImGui.Button("Flag传送##DiveTeleportFlag"))
+        {
+            if (coordinateTeleportService.TryDiveTeleportToFlag(configuration.DiveTeleportCancelRiseAnimation,
+                    out var flagDestination, out diveTeleportStatus))
+            {
+                diveTeleportDestination = flagDestination;
+                diveTeleportStatus = string.Empty;
+            }
         }
         ImGui.EndDisabled();
         if (!string.IsNullOrWhiteSpace(diveTeleportStatus))
@@ -2025,7 +2040,9 @@ public sealed class MainWindow : Window
             configuration.Save();
             if (id.StartsWith("Tool", StringComparison.Ordinal)
                 || id.StartsWith("FrontlineRadar", StringComparison.Ordinal)
-                || id is nameof(Configuration.NoBackswingMovement) or nameof(Configuration.CancelFishingAnimation))
+                || id is nameof(Configuration.NoBackswingMovement) or nameof(Configuration.CancelFishingAnimation)
+                    or nameof(Configuration.CancelGatheringAnimation)
+                    or nameof(Configuration.DiveTeleportCancelRiseAnimation))
                 diagnostics.Write("工具开关", $"{label}：{(value ? "开启" : "关闭")}。");
         }
     }
