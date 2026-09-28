@@ -1,7 +1,6 @@
 using System.Numerics;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.Conditions;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 
 namespace Soumen.Services;
@@ -19,8 +18,6 @@ internal enum TeleportDirection
 /// <summary>One-shot, same-territory teleport using the client's GameObject position function.</summary>
 internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnostics)
 {
-    private const string FlightPositionSignature = "4C ?? ?? ?? ?? ?? ?? 48 ?? ?? 48 ?? ?? BF";
-
     public bool TryTeleportInDirection(TeleportDirection direction, float distance, out string status)
     {
         if (!float.IsFinite(distance) || distance < 0.1f || distance > 100f)
@@ -67,62 +64,45 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
         }
 
         var player = Plugin.ObjectTable.LocalPlayer;
-        if (player == null || player.Address == 0 || Plugin.ClientState.TerritoryType == 0
-            || !Plugin.Condition[ConditionFlag.Diving]
+        if (player == null || player.Address == 0 || !float.IsFinite(player.Rotation)
+            || Plugin.ClientState.TerritoryType == 0
             || Plugin.Condition[ConditionFlag.BetweenAreas] || Plugin.Condition[ConditionFlag.BetweenAreas51]
             || Plugin.Condition[ConditionFlag.WatchingCutscene] || Plugin.Condition[ConditionFlag.OccupiedInCutSceneEvent])
         {
-            status = "仅在角色潜水且地图稳定时可使用潜水传送。";
+            status = "角色未就绪或正在切换区域、观看过场，无法潜水传送。";
+            return false;
+        }
+
+        if (Plugin.Condition[ConditionFlag.InCombat] || Plugin.Condition[ConditionFlag.Diving])
+        {
+            status = "潜水传送请在陆地脱战后使用。";
             return false;
         }
 
         try
         {
-            var signature = Plugin.SigScanner.ScanText(FlightPositionSignature);
-            if (signature == 0)
+            // Neko's TPDive calls the game's location command 607 (DiveEnd) with the
+            // destination, packet-encoded player rotation and the mounted correction flag.
+            // It is sent from the ground as well; it is not a write to the current dive position.
+            const float packetRotationScale = 10430.2195f;
+            var rotation = (int)Math.Clamp((player.Rotation + MathF.PI) * packetRotationScale, 0f, 65535f);
+            var mountedCorrection = Plugin.Condition[ConditionFlag.Mounted] ? 1 : 0;
+            if (!GameMain.ExecuteLocationCommand(607, &destination, rotation, mountedCorrection))
             {
-                status = "当前游戏版本未找到潜水位置结构。";
+                status = "客户端未接受潜水传送请求。";
                 diagnostics.Write("工具传送", status);
                 return false;
             }
 
-            // The RIP-relative instruction addresses the flight/dive state. Validate its live XYZ
-            // against the player position before writing; obsolete offsets must fail closed.
-            var ripRelativeOffset = Marshal.ReadInt32(signature + 3);
-            var state = signature + 7 + ripRelativeOffset + 0x5520 + 0x150;
-            var position = state + 16;
-            using var process = Process.GetCurrentProcess();
-            var module = process.MainModule;
-            if (module == null || position < module.BaseAddress
-                || position > module.BaseAddress + module.ModuleMemorySize - 12)
-            {
-                status = "潜水位置结构不在游戏模块内，已停止写入。";
-                diagnostics.Write("工具传送", status);
-                return false;
-            }
-            var current = new Vector3(
-                BitConverter.Int32BitsToSingle(Marshal.ReadInt32(position)),
-                BitConverter.Int32BitsToSingle(Marshal.ReadInt32(position + 4)),
-                BitConverter.Int32BitsToSingle(Marshal.ReadInt32(position + 8)));
-            if (!float.IsFinite(current.X) || !float.IsFinite(current.Y) || !float.IsFinite(current.Z)
-                || Vector3.DistanceSquared(current, player.Position) > 9f)
-            {
-                status = "潜水位置结构与角色坐标不符，已停止写入。";
-                diagnostics.Write("工具传送", status);
-                return false;
-            }
-
-            Marshal.WriteInt32(position, BitConverter.SingleToInt32Bits(destination.X));
-            Marshal.WriteInt32(position + 4, BitConverter.SingleToInt32Bits(destination.Y));
-            Marshal.WriteInt32(position + 8, BitConverter.SingleToInt32Bits(destination.Z));
-            status = $"已写入潜水坐标：X={destination.X:F2}，Y={destination.Y:F2}，Z={destination.Z:F2}。";
-            diagnostics.Write("工具传送", $"当前地图 {Plugin.ClientState.TerritoryType}：{status}");
+            status = string.Empty;
+            diagnostics.Write("工具传送", $"潜水传送已发送：地图={Plugin.ClientState.TerritoryType}，"
+                + $"X={destination.X:F2}，Y={destination.Y:F2}，Z={destination.Z:F2}。");
             return true;
         }
         catch (Exception exception)
         {
             status = $"潜水传送失败：{exception.GetType().Name}。";
-            diagnostics.WriteException("工具传送", "潜水位置写入", exception);
+            diagnostics.WriteException("工具传送", "潜水传送命令", exception);
             return false;
         }
     }

@@ -1110,7 +1110,10 @@ public sealed class MainWindow : Window
 
         ImGui.BeginDisabled(player == null);
         if (ImGui.Button("传送到坐标##CoordinateTeleportGo"))
-            coordinateTeleportService.TryTeleport(coordinateTeleportDestination, out coordinateTeleportStatus);
+        {
+            if (coordinateTeleportService.TryTeleport(coordinateTeleportDestination, out coordinateTeleportStatus))
+                coordinateTeleportStatus = string.Empty;
+        }
         ImGui.EndDisabled();
         if (!string.IsNullOrWhiteSpace(coordinateTeleportStatus))
             ImGui.TextColored(Muted, coordinateTeleportStatus);
@@ -1142,9 +1145,6 @@ public sealed class MainWindow : Window
             ImGui.TableNextRow();
             DrawDirectionalTeleportButton("← 左", TeleportDirection.Left);
             ImGui.TableNextColumn();
-            ImGui.PushStyleColor(ImGuiCol.Text, Muted);
-            ImGui.TextUnformatted("  ●");
-            ImGui.PopStyleColor();
             DrawDirectionalTeleportButton("→ 右", TeleportDirection.Right);
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
@@ -1170,7 +1170,10 @@ public sealed class MainWindow : Window
         ImGui.InputFloat("Z##DiveTeleportZ", ref diveTeleportDestination.Z, 0f, 0f, "%.2f");
         ImGui.BeginDisabled(player == null);
         if (ImGui.Button("潜水传送##DiveTeleportGo"))
-            coordinateTeleportService.TryDiveTeleport(diveTeleportDestination, out diveTeleportStatus);
+        {
+            if (coordinateTeleportService.TryDiveTeleport(diveTeleportDestination, out diveTeleportStatus))
+                diveTeleportStatus = string.Empty;
+        }
         ImGui.EndDisabled();
         if (!string.IsNullOrWhiteSpace(diveTeleportStatus))
             ImGui.TextColored(Muted, diveTeleportStatus);
@@ -1182,8 +1185,11 @@ public sealed class MainWindow : Window
         if (vertical)
             ImGui.PushStyleColor(ImGuiCol.Button, AccentSoft);
         if (ImGui.Button($"{label}##Teleport{direction}", new Vector2(vertical ? 76f : 62f, 38f) * ImGuiHelpers.GlobalScale))
-            coordinateTeleportService.TryTeleportInDirection(direction, configuration.DirectionalTeleportDistance,
-                out directionalTeleportStatus);
+        {
+            if (coordinateTeleportService.TryTeleportInDirection(direction, configuration.DirectionalTeleportDistance,
+                    out directionalTeleportStatus))
+                directionalTeleportStatus = string.Empty;
+        }
         if (vertical)
             ImGui.PopStyleColor();
     }
