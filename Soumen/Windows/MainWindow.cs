@@ -1160,10 +1160,6 @@ public sealed class MainWindow : Window
         ImGui.Spacing();
         ImGui.Separator();
         ImGui.TextUnformatted("潜水传送");
-        ImGui.SameLine(0f, 14f * scale);
-        DrawCheckbox("取消浮起动画", nameof(configuration.DiveTeleportCancelRiseAnimation),
-            configuration.DiveTeleportCancelRiseAnimation,
-            value => configuration.DiveTeleportCancelRiseAnimation = value);
         ImGui.SetNextItemWidth(width);
         ImGui.InputFloat("X##DiveTeleportX", ref diveTeleportDestination.X, 0f, 0f, "%.2f");
         ImGui.SameLine();
@@ -1175,15 +1171,13 @@ public sealed class MainWindow : Window
         ImGui.BeginDisabled(player == null);
         if (ImGui.Button("潜水传送##DiveTeleportGo"))
         {
-            if (coordinateTeleportService.TryDiveTeleport(diveTeleportDestination,
-                    configuration.DiveTeleportCancelRiseAnimation, out diveTeleportStatus))
+            if (coordinateTeleportService.TryDiveTeleport(diveTeleportDestination, out diveTeleportStatus))
                 diveTeleportStatus = string.Empty;
         }
         ImGui.SameLine(0f, 10f * scale);
         if (ImGui.Button("Flag传送##DiveTeleportFlag"))
         {
-            if (coordinateTeleportService.TryDiveTeleportToFlag(configuration.DiveTeleportCancelRiseAnimation,
-                    out var flagDestination, out diveTeleportStatus))
+            if (coordinateTeleportService.TryDiveTeleportToFlag(out var flagDestination, out diveTeleportStatus))
             {
                 diveTeleportDestination = flagDestination;
                 diveTeleportStatus = string.Empty;
@@ -2041,8 +2035,7 @@ public sealed class MainWindow : Window
             if (id.StartsWith("Tool", StringComparison.Ordinal)
                 || id.StartsWith("FrontlineRadar", StringComparison.Ordinal)
                 || id is nameof(Configuration.NoBackswingMovement) or nameof(Configuration.CancelFishingAnimation)
-                    or nameof(Configuration.CancelGatheringAnimation)
-                    or nameof(Configuration.DiveTeleportCancelRiseAnimation))
+                    or nameof(Configuration.CancelGatheringAnimation))
                 diagnostics.Write("工具开关", $"{label}：{(value ? "开启" : "关闭")}。");
         }
     }
