@@ -152,7 +152,8 @@ public sealed class Plugin : IDalamudPlugin
         if (configuration.ToolRecastReduction) selected.Add("复唱缩减");
         if (configuration.ToolRecastReduction && configuration.ToolRapidMudra) selected.Add("快速结印");
         if (configuration.ToolCastReduction) selected.Add("咏唱缩减");
-        if (configuration.CancelFishingAnimation) selected.Add("取消钓鱼动画");
+        if (configuration.CancelFishingAnimation) selected.Add("取消钓鱼后摇");
+        if (configuration.CancelGatheringAnimation) selected.Add("取消采集后摇");
         if (configuration.FrontlineRadarEnabled) selected.Add("战场透视");
         if (selected.Count == 0) return;
         using var process = Process.GetCurrentProcess();

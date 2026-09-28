@@ -82,6 +82,8 @@ public sealed class Configuration : IPluginConfiguration
 
     public bool CancelFishingAnimation { get; set; } = false;
 
+    public bool CancelGatheringAnimation { get; set; } = false;
+
     public HashSet<string> ToolFavorites { get; set; } = [];
 
     public bool ToolSpeedEnabled { get; set; } = false;
