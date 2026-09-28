@@ -238,7 +238,7 @@ public sealed class Configuration : IPluginConfiguration
         configuration.ToolFavorites ??= [];
         configuration.ToolSpeedMultiplier = Math.Clamp(configuration.ToolSpeedMultiplier, 1f, 5f);
         configuration.ToolActionRangeBonus = Math.Clamp(configuration.ToolActionRangeBonus, 0f, 3f);
-        configuration.ToolTargetRadius = Math.Clamp(configuration.ToolTargetRadius, 0f, 5f);
+        configuration.ToolTargetRadius = Math.Clamp(configuration.ToolTargetRadius, 0f, 3f);
         configuration.ToolRecastSeconds = Math.Clamp(configuration.ToolRecastSeconds, 0f, 1f);
         configuration.ToolCastSeconds = Math.Clamp(configuration.ToolCastSeconds, 0f, 1f);
         configuration.ToolVerticalOffset = Math.Clamp(configuration.ToolVerticalOffset, -10f, 10f);

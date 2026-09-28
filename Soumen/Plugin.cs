@@ -145,7 +145,7 @@ public sealed class Plugin : IDalamudPlugin
         if (configuration.ToolIgnoreCharm) selected.Add("无视魅惑恐惧");
         if (configuration.ToolStatusBlock) selected.Add("状态屏蔽");
         if (configuration.ToolMovingCast) selected.Add("移动读条");
-        if (configuration.ToolActionRangeEnabled) selected.Add("技能距离");
+        if (configuration.ToolActionRangeEnabled) selected.Add("技能无视距离");
         if (configuration.ToolTargetRadiusEnabled) selected.Add("目标圈大小");
         if (configuration.NoBackswingMovement) selected.Add("后摇可移动");
         if (configuration.ToolNoActionMove) selected.Add("突进无位移");

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Dalamud.Hooking;
 using Dalamud.Plugin.Services;
@@ -8,11 +9,18 @@ namespace Soumen.Services;
 /// <summary>Combat hooks whose native entrypoints were checked against a running client snapshot.</summary>
 internal sealed class ToolCombatService : IDisposable
 {
+    // The native range / line-of-sight result is separate from GetActionRange.
+    // Gap closers consult this entry even when the displayed action range is increased.
+    private const string ActionInRangeSignature = "E8 ?? ?? ?? ?? 85 C0 75 02 33 C0";
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate nint NoBackswingDelegate(nint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate float GetActionRangeDelegate(uint actionId);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate uint GetActionInRangeDelegate(uint actionId, nint sourceObject, nint targetObject);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate float GetActorRadiusDelegate(nuint actor, byte kind);
@@ -24,6 +32,7 @@ internal sealed class ToolCombatService : IDisposable
     private readonly DiagnosticLogger diagnostics;
     private Hook<NoBackswingDelegate>? noBackswing;
     private Hook<GetActionRangeDelegate>? actionRange;
+    private Hook<GetActionInRangeDelegate>? actionInRange;
     private Hook<GetActorRadiusDelegate>? actorRadius;
     private Hook<NoActionMoveDelegate>? noActionMove;
 
@@ -44,6 +53,7 @@ internal sealed class ToolCombatService : IDisposable
         Plugin.Framework.Update -= OnFrameworkUpdate;
         actorRadius?.Dispose();
         noActionMove?.Dispose();
+        actionInRange?.Dispose();
         actionRange?.Dispose();
         noBackswing?.Dispose();
     }
@@ -77,6 +87,7 @@ internal sealed class ToolCombatService : IDisposable
         if (!configuration.ToolActionRangeEnabled || ExternalHookGuard.Blocks("ActionRangeHook", configuration.ToolActionRangeEnabled, diagnostics))
         {
             if (actionRange?.IsEnabled == true) actionRange.Disable();
+            if (actionInRange?.IsEnabled == true) actionInRange.Disable();
         }
         else if (!rangeFailed)
         {
@@ -88,12 +99,30 @@ internal sealed class ToolCombatService : IDisposable
                     if (address == 0) rangeFailed = true;
                     else actionRange = Plugin.GameInteropProvider.HookFromAddress<GetActionRangeDelegate>(address, GetActionRange);
                 }
-                if (actionRange?.IsEnabled == false) { actionRange.Enable(); diagnostics.Write("工具 Hook", "技能距离已接管。"); }
+                if (!rangeFailed && actionInRange == null)
+                {
+                    var address = ResolveActionInRangeEntry();
+                    if (address == 0)
+                    {
+                        rangeFailed = true;
+                        diagnostics.Write("工具 Hook", "技能无视距离不可用：突进距离判定入口未匹配当前客户端。");
+                    }
+                    else actionInRange = Plugin.GameInteropProvider.HookFromAddress<GetActionInRangeDelegate>(address, IgnoreActionRange);
+                }
+                if (!rangeFailed && actionRange != null && actionInRange != null)
+                {
+                    var wasDisabled = !actionRange.IsEnabled || !actionInRange.IsEnabled;
+                    if (!actionRange.IsEnabled) actionRange.Enable();
+                    if (!actionInRange.IsEnabled) actionInRange.Enable();
+                    if (wasDisabled) diagnostics.Write("工具 Hook", "技能无视距离已接管。");
+                }
             }
             catch (Exception exception)
             {
                 rangeFailed = true;
-                ReportFailure("技能距离", exception);
+                if (actionRange?.IsEnabled == true) actionRange.Disable();
+                if (actionInRange?.IsEnabled == true) actionInRange.Disable();
+                ReportFailure("技能无视距离", exception);
             }
         }
 
@@ -153,6 +182,28 @@ internal sealed class ToolCombatService : IDisposable
         if (sheet == null || !sheet.TryGetRow(actionId, out var action) || action.TargetArea)
             return original;
         return original + configuration.ToolActionRangeBonus;
+    }
+
+    private uint IgnoreActionRange(uint actionId, nint sourceObject, nint targetObject)
+        => configuration.ToolActionRangeEnabled ? 0u
+            : actionInRange!.Original(actionId, sourceObject, targetObject);
+
+    public static bool IsActionInRangeEntryAvailable() => ResolveActionInRangeEntry() != 0;
+
+    private static nint ResolveActionInRangeEntry()
+    {
+        try
+        {
+            using var process = Process.GetCurrentProcess();
+            var module = process.MainModule;
+            if (module == null || module.ModuleMemorySize != 0x380A000
+                || !Plugin.SigScanner.TryScanText(ActionInRangeSignature, out var address)) return 0;
+
+            // ScanText resolves the leading E8 call to the native target.
+            return address >= module.BaseAddress && address - module.BaseAddress < module.ModuleMemorySize
+                ? address : 0;
+        }
+        catch { return 0; }
     }
 
     private float GetRadius(nuint actor, byte kind)
