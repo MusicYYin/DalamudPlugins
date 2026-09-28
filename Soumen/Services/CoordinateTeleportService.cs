@@ -186,14 +186,9 @@ internal sealed unsafe class CoordinateTeleportService(DiagnosticLogger diagnost
                 return false;
             }
 
-            var callAddress = Plugin.SigScanner.ScanText(SendPositionPacketCall);
-            if (!SafeMemory.Read<int>(callAddress + 1, out var displacement))
-            {
-                error = "无法读取移动包发送入口";
-                return false;
-            }
-
-            var target = callAddress + 5 + displacement;
+            // For a signature starting with E8, Dalamud's ScanText already resolves
+            // the call and returns its actual target. Do not decode a second rel32.
+            var target = Plugin.SigScanner.ScanText(SendPositionPacketCall);
             if (target < gameModule.BaseAddress
                 || target - gameModule.BaseAddress >= gameModule.ModuleMemorySize)
             {
