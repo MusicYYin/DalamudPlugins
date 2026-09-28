@@ -853,7 +853,7 @@ public sealed class MainWindow : Window
             ("无掉落", nameof(configuration.ToolNoDrop), configuration.ToolNoDrop, () => configuration.ToolNoDrop = false),
             ("无视魅惑恐惧", nameof(configuration.ToolIgnoreCharm), configuration.ToolIgnoreCharm, () => configuration.ToolIgnoreCharm = false),
             ("状态屏蔽（滑冰）", nameof(configuration.ToolStatusBlock), configuration.ToolStatusBlock, () => configuration.ToolStatusBlock = false),
-            ("技能距离", nameof(configuration.ToolActionRangeEnabled), configuration.ToolActionRangeEnabled, () => configuration.ToolActionRangeEnabled = false),
+            ("技能无视距离", nameof(configuration.ToolActionRangeEnabled), configuration.ToolActionRangeEnabled, () => configuration.ToolActionRangeEnabled = false),
             ("目标圈大小", nameof(configuration.ToolTargetRadiusEnabled), configuration.ToolTargetRadiusEnabled, () => configuration.ToolTargetRadiusEnabled = false),
             ("后摇可移动", nameof(configuration.NoBackswingMovement), configuration.NoBackswingMovement, () => configuration.NoBackswingMovement = false),
             ("突进无位移", nameof(configuration.ToolNoActionMove), configuration.ToolNoActionMove, () => configuration.ToolNoActionMove = false),
@@ -962,13 +962,13 @@ public sealed class MainWindow : Window
                 nameof(configuration.ToolActionRangeEnabled), nameof(configuration.ToolTargetRadiusEnabled),
                 nameof(configuration.NoBackswingMovement), nameof(configuration.ToolNoActionMove)))
         {
-            if (DrawToolToggle("技能距离", nameof(configuration.ToolActionRangeEnabled), configuration.ToolActionRangeEnabled,
+            if (DrawToolToggle("技能无视距离", nameof(configuration.ToolActionRangeEnabled), configuration.ToolActionRangeEnabled,
                     value => configuration.ToolActionRangeEnabled = value, favoritesOnly))
-                DrawToolSlider("ToolRange", "技能距离增加量", configuration.ToolActionRangeBonus, 0f, 3f, "+%.1f y",
+                DrawToolSlider("ToolRange", "普通技能余量", configuration.ToolActionRangeBonus, 0f, 3f, "+%.1f y",
                     configuration.ToolActionRangeEnabled, value => configuration.ToolActionRangeBonus = value);
             if (DrawToolToggle("目标圈大小", nameof(configuration.ToolTargetRadiusEnabled), configuration.ToolTargetRadiusEnabled,
                     value => configuration.ToolTargetRadiusEnabled = value, favoritesOnly))
-                DrawToolSlider("ToolRadius", "目标圈半径增加量", configuration.ToolTargetRadius, 0f, 5f, "+%.1f y",
+                DrawToolSlider("ToolRadius", "目标圈半径增加量", configuration.ToolTargetRadius, 0f, 3f, "+%.1f y",
                     configuration.ToolTargetRadiusEnabled, value => configuration.ToolTargetRadius = value);
             DrawToolToggle("后摇可移动", nameof(configuration.NoBackswingMovement), configuration.NoBackswingMovement,
                 value => configuration.NoBackswingMovement = value, favoritesOnly);
@@ -1226,7 +1226,7 @@ public sealed class MainWindow : Window
             ("状态屏蔽（滑冰）", nameof(configuration.ToolStatusBlock)),
         ]);
         DrawToolStatusGroup("战斗", [
-            ("技能距离", nameof(configuration.ToolActionRangeEnabled)),
+            ("技能无视距离", nameof(configuration.ToolActionRangeEnabled)),
             ("目标圈大小", nameof(configuration.ToolTargetRadiusEnabled)),
             ("后摇可移动", nameof(configuration.NoBackswingMovement)),
             ("突进无位移", nameof(configuration.ToolNoActionMove)),

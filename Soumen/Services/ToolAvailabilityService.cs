@@ -22,7 +22,6 @@ internal sealed class ToolAvailabilityService
         (nameof(Configuration.ToolNoDrop), "FallCheck", ["_FallCheckHook"]),
         (nameof(Configuration.ToolIgnoreCharm), "StatusCheck", ["noBewitchActionHook"]),
         (nameof(Configuration.ToolStatusBlock), "StatusCheck", ["_StatusCheckHook", "_ProcessPacketStatusEffectHookGL"]),
-        (nameof(Configuration.ToolActionRangeEnabled), "ActionRangeHook", ["_ActionRangeHook"]),
         (nameof(Configuration.ToolTargetRadiusEnabled), "ActorRadiusHook", ["_ActorRadiusHook"]),
         (nameof(Configuration.NoBackswingMovement), "NoBackswingHook", ["_NoBackswingHook"]),
         (nameof(Configuration.ToolNoActionMove), "NoActionMoveHook", ["_NoActionMoveHook"]),
@@ -44,6 +43,9 @@ internal sealed class ToolAvailabilityService
         foreach (var (id, guard, addresses) in FixedEntries)
             snapshot[id] = Status(addresses.All(ToolHookAddresses.IsAvailable), guard);
 
+        snapshot[nameof(Configuration.ToolActionRangeEnabled)] = Status(
+            ToolHookAddresses.IsAvailable("_ActionRangeHook") && ToolCombatService.IsActionInRangeEntryAvailable(),
+            "ActionRangeHook");
         snapshot[nameof(Configuration.ToolMovingCast)] =
             Status(ToolMovingCastService.IsEntryAvailable(), "NetRe");
         snapshot[nameof(Configuration.ToolCastReduction)] =
