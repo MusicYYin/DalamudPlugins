@@ -110,6 +110,8 @@ public sealed class Configuration : IPluginConfiguration
 
     public float ToolMovingCastWindow { get; set; } = 0.3f;
 
+    public float DirectionalTeleportDistance { get; set; } = 5f;
+
     public bool ToolActionRangeEnabled { get; set; } = false;
 
     public float ToolActionRangeBonus { get; set; } = 2f;
@@ -238,6 +240,8 @@ public sealed class Configuration : IPluginConfiguration
         configuration.ToolCastSeconds = Math.Clamp(configuration.ToolCastSeconds, 0f, 1f);
         configuration.ToolVerticalOffset = Math.Clamp(configuration.ToolVerticalOffset, -10f, 10f);
         configuration.ToolMovingCastWindow = Math.Clamp(configuration.ToolMovingCastWindow, 0f, 1f);
+        configuration.DirectionalTeleportDistance = float.IsFinite(configuration.DirectionalTeleportDistance)
+            ? Math.Clamp(configuration.DirectionalTeleportDistance, 0.1f, 100f) : 5f;
         configuration.Version = 18;
         configuration.Save();
         return configuration;
