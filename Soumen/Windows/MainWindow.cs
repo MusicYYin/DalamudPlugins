@@ -131,7 +131,7 @@ public sealed class MainWindow : Window
         }
 
         var scale = ImGuiHelpers.GlobalScale;
-        ImGui.PushStyleColor(ImGuiCol.ChildBg, Panel);
+        ImGui.PushStyleColor(ImGuiCol.ChildBg, Theme.WindowBg);
         if (ImGui.BeginChild("##SoumenSidebar", new Vector2(56f * scale, 0f), false))
         {
             ImGui.Spacing();
@@ -964,7 +964,7 @@ public sealed class MainWindow : Window
         {
             if (DrawToolToggle("技能无视距离", nameof(configuration.ToolActionRangeEnabled), configuration.ToolActionRangeEnabled,
                     value => configuration.ToolActionRangeEnabled = value, favoritesOnly))
-                DrawToolSlider("ToolRange", "普通技能余量", configuration.ToolActionRangeBonus, 0f, 3f, "+%.1f y",
+                DrawToolSlider("ToolRange", "普通技能增加量", configuration.ToolActionRangeBonus, 0f, 3f, "+%.1f y",
                     configuration.ToolActionRangeEnabled, value => configuration.ToolActionRangeBonus = value);
             if (DrawToolToggle("目标圈大小", nameof(configuration.ToolTargetRadiusEnabled), configuration.ToolTargetRadiusEnabled,
                     value => configuration.ToolTargetRadiusEnabled = value, favoritesOnly))
@@ -1023,8 +1023,6 @@ public sealed class MainWindow : Window
             configuration.FrontlineRadarLines, value => configuration.FrontlineRadarLines = value);
         DrawCheckbox("显示职业图标", nameof(configuration.FrontlineRadarJobIcons),
             configuration.FrontlineRadarJobIcons, value => configuration.FrontlineRadarJobIcons = value);
-        DrawCheckbox("显示战意图标", nameof(configuration.FrontlineRadarBattleHighIcons),
-            configuration.FrontlineRadarBattleHighIcons, value => configuration.FrontlineRadarBattleHighIcons = value);
         ImGui.Unindent(22f * ImGuiHelpers.GlobalScale);
         ImGui.EndDisabled();
     }

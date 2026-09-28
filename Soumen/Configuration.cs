@@ -76,8 +76,6 @@ public sealed class Configuration : IPluginConfiguration
 
     public bool FrontlineRadarJobIcons { get; set; } = true;
 
-    public bool FrontlineRadarBattleHighIcons { get; set; } = true;
-
     public bool NoBackswingMovement { get; set; } = false;
 
     public bool CancelFishingAnimation { get; set; } = false;
@@ -234,6 +232,7 @@ public sealed class Configuration : IPluginConfiguration
         configuration.TreasureSpotCorrectionRange = Math.Clamp(configuration.TreasureSpotCorrectionRange, 0f, 150f);
         configuration.DungeonFollowDistance = Math.Clamp(configuration.DungeonFollowDistance, 0f, 10f);
         configuration.FrontlineRadarRange = Math.Clamp(configuration.FrontlineRadarRange, 20f, 200f);
+        configuration.PreviousSettings?.Remove("FrontlineRadarBattleHighIcons");
         configuration.PreviousSettings?.Remove("DiveTeleportCancelRiseAnimation");
         configuration.ToolFavorites ??= [];
         configuration.ToolSpeedMultiplier = Math.Clamp(configuration.ToolSpeedMultiplier, 1f, 5f);
