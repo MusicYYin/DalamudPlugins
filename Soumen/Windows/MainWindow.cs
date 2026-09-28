@@ -60,6 +60,7 @@ public sealed class MainWindow : Window
     private float currentSpeed;
     private Vector3 coordinateTeleportDestination;
     private string coordinateTeleportStatus = string.Empty;
+    private string directionalTeleportStatus = string.Empty;
 
     private ThemePalette Theme => GetTheme(configuration.UiTheme);
     private Vector4 Accent => Theme.Accent;
@@ -1108,6 +1109,45 @@ public sealed class MainWindow : Window
         ImGui.EndDisabled();
         if (!string.IsNullOrWhiteSpace(coordinateTeleportStatus))
             ImGui.TextColored(Muted, coordinateTeleportStatus);
+
+        ImGui.Spacing();
+        ImGui.Spacing();
+        ImGui.PushStyleColor(ImGuiCol.Text, Accent);
+        ImGui.TextUnformatted("方向传送");
+        ImGui.PopStyleColor();
+        ImGui.SameLine(0f, 14f * scale);
+        ImGui.SetNextItemWidth(96f * scale);
+        var distance = configuration.DirectionalTeleportDistance;
+        if (ImGui.InputFloat("距离（y）##DirectionalTeleportDistance", ref distance, 0.5f, 5f, "%.1f"))
+        {
+            configuration.DirectionalTeleportDistance = float.IsFinite(distance)
+                ? Math.Clamp(distance, 0.1f, 100f) : 5f;
+            configuration.Save();
+        }
+        ImGui.Separator();
+        ImGui.TextColored(Muted, "前后左右按角色朝向计算，上下改变高度；每点一次移动设定的距离。");
+        ImGui.BeginDisabled(player == null);
+        if (ImGui.BeginTable("##DirectionalTeleportButtons", 3, ImGuiTableFlags.SizingFixedFit))
+        {
+            DrawDirectionalTeleportButton("↑ 前", TeleportDirection.Forward);
+            DrawDirectionalTeleportButton("↓ 后", TeleportDirection.Backward);
+            DrawDirectionalTeleportButton("▲ 上", TeleportDirection.Up);
+            DrawDirectionalTeleportButton("← 左", TeleportDirection.Left);
+            DrawDirectionalTeleportButton("→ 右", TeleportDirection.Right);
+            DrawDirectionalTeleportButton("▼ 下", TeleportDirection.Down);
+            ImGui.EndTable();
+        }
+        ImGui.EndDisabled();
+        if (!string.IsNullOrWhiteSpace(directionalTeleportStatus))
+            ImGui.TextColored(Muted, directionalTeleportStatus);
+    }
+
+    private void DrawDirectionalTeleportButton(string label, TeleportDirection direction)
+    {
+        ImGui.TableNextColumn();
+        if (ImGui.Button($"{label}##Teleport{direction}", new Vector2(86f, 34f) * ImGuiHelpers.GlobalScale))
+            coordinateTeleportService.TryTeleportInDirection(direction, configuration.DirectionalTeleportDistance,
+                out directionalTeleportStatus);
     }
 
     private void DrawToolStatus()
