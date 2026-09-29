@@ -1,6 +1,6 @@
-# Soumen
+# DalamudPlugins
 
-适用于 FF14 Dalamud 的实用工具插件，提供寻宝、狩猎、PVP 等功能。
+MusicYYin 的 FF14 Dalamud 插件发布库。目前提供 Soumen（寻宝、狩猎、PVP）的编译成品。
 
 ## 安装
 
