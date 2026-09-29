@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.0.0",
+    "AssemblyVersion": "0.6.0.1",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -17,14 +17,14 @@
     ],
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkInstall": "https://github.com/MusicYYin/DalamudPlugins/releases/download/0.6.0.0/Soumen.zip",
-    "DownloadLinkTesting": "https://github.com/MusicYYin/DalamudPlugins/releases/download/0.6.0.0/Soumen.zip",
-    "DownloadLinkUpdate": "https://github.com/MusicYYin/DalamudPlugins/releases/download/0.6.0.0/Soumen.zip",
+    "DownloadLinkInstall": "https://github.com/MusicYYin/DalamudPlugins/releases/download/Soumen-0.6.0.1/Soumen.zip",
+    "DownloadLinkTesting": "https://github.com/MusicYYin/DalamudPlugins/releases/download/Soumen-0.6.0.1/Soumen.zip",
+    "DownloadLinkUpdate": "https://github.com/MusicYYin/DalamudPlugins/releases/download/Soumen-0.6.0.1/Soumen.zip",
     "LoadRequiredState": 0,
     "LoadSync": false,
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-09-29T10:27:38.452Z"
+    "LastUpdated": "2026-09-29T11:52:36.504Z"
   }
 ]
