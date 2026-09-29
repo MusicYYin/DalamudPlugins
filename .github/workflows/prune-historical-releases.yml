@@ -1,0 +1,32 @@
+name: Prune historical releases
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify current release and index, then delete older releases
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'MusicYYin/Soumen'
+          index=$(curl -fsSL 'https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/pluginmaster.json')
+          test "$(jq -r '.[] | select(.InternalName == "Soumen") | .AssemblyVersion' <<< "$index")" = '0.6.0.0'
+          test "$(jq -r '.[] | select(.InternalName == "Soumen") | .DownloadLinkUpdate' <<< "$index")" = 'https://github.com/MusicYYin/Soumen/releases/download/0.6.0.0/Soumen.zip'
+          test "$(gh release view 0.6.0.0 --repo MusicYYin/Soumen --json assets --jq '.assets[] | select(.name == "Soumen.zip") | .name')" = 'Soumen.zip'
+          mapfile -t tags < <(gh release list --repo MusicYYin/Soumen --limit 1000 --json tagName --jq '.[].tagName')
+          test "${#tags[@]}" -eq 60
+          for tag in "${tags[@]}"; do
+            if [[ "$tag" != '0.6.0.0' ]]; then
+              gh release delete "$tag" --repo MusicYYin/Soumen --yes
+              echo "Deleted release $tag"
+            fi
+          done
+          test "$(gh release list --repo MusicYYin/Soumen --limit 1000 --json tagName --jq '.[].tagName')" = '0.6.0.0'
