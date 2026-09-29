@@ -1,21 +1,11 @@
-MIT License
+Soumen release licensing
 
-Copyright (c) 2026 MusicYYin
+Copyright (c) 2026 MusicYYin. All rights reserved for new code and changes
+first released in Soumen 0.6.0.0 or later. The compiled plugin is publicly
+available for Dalamud users to download and use. No source-code license is
+granted for the new code by this repository.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Source code previously published under MIT remains available under its
+original terms. See LICENSE-MIT-THROUGH-0.5.7.20.txt and the older commits
+for the relevant historical versions. This notice does not revoke those
+permissions or supersede notices belonging to third parties.
