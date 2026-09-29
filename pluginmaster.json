@@ -1,0 +1,30 @@
+[
+  {
+    "Author": "MusicYYin",
+    "Name": "Soumen",
+    "Punchline": "实用工具",
+    "Description": "实用工具",
+    "InternalName": "Soumen",
+    "AssemblyVersion": "0.6.0.0",
+    "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
+    "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
+    "ApplicableVersion": "any",
+    "DalamudApiLevel": 15,
+    "Tags": [
+      "tools",
+      "utility",
+      "Chinese"
+    ],
+    "IsHide": false,
+    "IsTestingExclusive": false,
+    "DownloadLinkInstall": "https://github.com/MusicYYin/DalamudPlugins/releases/download/0.6.0.0/Soumen.zip",
+    "DownloadLinkTesting": "https://github.com/MusicYYin/DalamudPlugins/releases/download/0.6.0.0/Soumen.zip",
+    "DownloadLinkUpdate": "https://github.com/MusicYYin/DalamudPlugins/releases/download/0.6.0.0/Soumen.zip",
+    "LoadRequiredState": 0,
+    "LoadSync": false,
+    "LoadPriority": 0,
+    "CanUnloadAsync": false,
+    "AcceptsFeedback": true,
+    "LastUpdated": "2026-09-29T10:27:38.452Z"
+  }
+]
