@@ -1,10 +1,9 @@
-Soumen release licensing
+Soumen License
 
-Copyright (c) 2026 MusicYYin. All rights reserved for new code and changes
-first released in Soumen 0.6.0.0 or later. The compiled plugin is publicly
-available for Dalamud users to download and use. No source-code license is
-granted for the new code by this repository.
+Copyright (c) 2026 MusicYYin. All rights reserved.
 
-Source code previously published under MIT remains under its original terms
-in the older commits and tags. This notice does not revoke those permissions
-or supersede notices belonging to third parties.
+The compiled plugin may be downloaded and used with Dalamud.
+This repository does not grant permission to redistribute or reuse the
+source code without written authorization from the copyright holder.
+
+Third-party notices remain subject to their own licenses.
