@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.8",
+    "AssemblyVersion": "0.6.2.9",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-02T12:36:09.584Z",
-    "Changelog": "PvP 职业图标更新：武士刀、长柄镰刀、下劈刀刃与冲击线、三把扇形飞刀。沿用石墨蓝紫风格与矢量缩放。"
+    "LastUpdated": "2026-10-02T13:02:03.434Z",
+    "Changelog": "武士斩铁剑改用原忍者匕首图标；忍者星遁天诛改用四刃手里剑。移除完整伤害预测选项及占位逻辑，使用血量阈值判断；更新自动清理旧预测字段并保留原有配置。"
   }
 ]
