@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.4",
+    "AssemblyVersion": "0.6.2.5",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,6 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-09-30T12:47:03.000Z"
+    "LastUpdated": "2026-10-02T09:12:26.000Z",
+    "Changelog": "新增即刻返回、技能无视目标遮挡、屏蔽降低移速效果和心电图；按 Neko 防跌落重做，调整战斗分类与滑冰名称。"
   }
 ]
