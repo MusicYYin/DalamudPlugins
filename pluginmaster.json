@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.7",
+    "AssemblyVersion": "0.6.2.8",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-02T12:12:22.084Z",
-    "Changelog": "PvP 职业新增武士斩铁剑、镰刀完人斩杀、自动猛击、远敏斩杀，补齐配置、目标判断、命中后猛击与统一日志；核对 DR 遮挡补丁并保持全地图启用。完整预测的参考规则为空时回退手动阈值。"
+    "LastUpdated": "2026-10-02T12:36:09.584Z",
+    "Changelog": "PvP 职业图标更新：武士刀、长柄镰刀、下劈刀刃与冲击线、三把扇形飞刀。沿用石墨蓝紫风格与矢量缩放。"
   }
 ]
