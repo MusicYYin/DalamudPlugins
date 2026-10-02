@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.9",
+    "AssemblyVersion": "0.6.2.10",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-02T13:02:03.434Z",
-    "Changelog": "武士斩铁剑改用原忍者匕首图标；忍者星遁天诛改用四刃手里剑。移除完整伤害预测选项及占位逻辑，使用血量阈值判断；更新自动清理旧预测字段并保留原有配置。"
+    "LastUpdated": "2026-10-02T13:58:18.356Z",
+    "Changelog": "移除命令帮助中无效的 /soumen return 提示，/soumen 描述仅保留“打开 Soumen 面板”。"
   }
 ]
