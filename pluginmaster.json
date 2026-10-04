@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.12",
+    "AssemblyVersion": "0.6.2.13",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-04T09:54:47.392Z",
-    "Changelog": "细调分类文字水平居中；自动目标固定排除冲天，新增受保护目标和地天武士筛选，移除仅近战限制；更新自动自愈的暗骑LB文案。"
+    "LastUpdated": "2026-10-04T10:58:23.284Z",
+    "Changelog": "自动选目标恢复独立“排除防御目标”，与受保护目标、地天武士筛选分别开关；升级保留原有选择。"
   }
 ]
