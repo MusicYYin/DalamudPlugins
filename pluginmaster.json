@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.10",
+    "AssemblyVersion": "0.6.2.11",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-02T13:58:18.356Z",
-    "Changelog": "移除命令帮助中无效的 /soumen return 提示，/soumen 描述仅保留“打开 Soumen 面板”。"
+    "LastUpdated": "2026-10-04T08:47:04.497Z",
+    "Changelog": "修复宝物库切图后 BMR AI 空闲未恢复；寻宝新增自动接受复活。同步 PvP 忍者生命值下限、防御死亡清理及目标归属校验，优化分类文字居中。"
   }
 ]
