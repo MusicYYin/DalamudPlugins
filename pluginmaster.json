@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.13",
+    "AssemblyVersion": "0.6.2.14",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-04T10:58:23.284Z",
-    "Changelog": "自动选目标恢复独立“排除防御目标”，与受保护目标、地天武士筛选分别开关；升级保留原有选择。"
+    "LastUpdated": "2026-10-05T09:02:36.580Z",
+    "Changelog": "/soumen 改为打开/关闭界面切换，重复输入可关闭已打开的面板。"
   }
 ]
