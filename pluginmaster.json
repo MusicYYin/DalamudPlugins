@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.14",
+    "AssemblyVersion": "0.6.2.15",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-05T09:02:36.580Z",
-    "Changelog": "/soumen 改为打开/关闭界面切换，重复输入可关闭已打开的面板。"
+    "LastUpdated": "2026-10-07T07:51:46.501Z",
+    "Changelog": "飞天遁地新增深宫模式，普通层使用设定高度，首领层恢复正常高度；开启选项后显示灰色的当前遁地状态。"
   }
 ]
