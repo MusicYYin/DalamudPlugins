@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.15",
+    "AssemblyVersion": "0.6.2.16",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-07T07:51:46.501Z",
-    "Changelog": "飞天遁地新增深宫模式，普通层使用设定高度，首领层恢复正常高度；开启选项后显示灰色的当前遁地状态。"
+    "LastUpdated": "2026-10-08T17:58:52.629Z",
+    "Changelog": "工具入口改用特征码与SDK定位，移除旧模块大小硬限制；功能检测显示具体失败原因。开发者模式新增写入工具检测报告按钮，开启诊断模式后手动记录全部工具入口，功能关闭也能检测。"
   }
 ]
