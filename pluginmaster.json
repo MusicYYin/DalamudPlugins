@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.16",
+    "AssemblyVersion": "0.6.2.17",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-08T17:58:52.629Z",
-    "Changelog": "工具入口改用特征码与SDK定位，移除旧模块大小硬限制；功能检测显示具体失败原因。开发者模式新增写入工具检测报告按钮，开启诊断模式后手动记录全部工具入口，功能关闭也能检测。"
+    "LastUpdated": "2026-10-09T13:01:52.821Z",
+    "Changelog": "修复功能状态检查卡顿：后台扫描、分帧快照和检测缓存，插件冲突信息不再反复遍历类型。修正复唱缩减与快速结印的重复地址匹配；检测报告按钮异步执行，完成后统一写入日志。"
   }
 ]
