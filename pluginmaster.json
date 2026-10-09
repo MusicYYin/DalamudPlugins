@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.17",
+    "AssemblyVersion": "0.6.2.18",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-09T13:01:52.821Z",
-    "Changelog": "修复功能状态检查卡顿：后台扫描、分帧快照和检测缓存，插件冲突信息不再反复遍历类型。修正复唱缩减与快速结印的重复地址匹配；检测报告按钮异步执行，完成后统一写入日志。"
+    "LastUpdated": "2026-10-09T13:50:31.255Z",
+    "Changelog": "修复快速结印普通首印复唱偏长：补齐首印动作与计时写入入口，普通三印和生杀连印统一短间隔；长充能保留原复唱设置。功能状态检查同时检测两条入口。"
   }
 ]
