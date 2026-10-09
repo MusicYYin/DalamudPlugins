@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.19",
+    "AssemblyVersion": "0.6.2.20",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-09T14:28:09.755Z",
-    "Changelog": "统一深宫模式与快速结印的子选项显示：仅在主功能开启后展开，关闭后收起对应参数和选项，保留之前的勾选及数值。"
+    "LastUpdated": "2026-10-09T14:55:01.953Z",
+    "Changelog": "工具其余参数统一随主开关展开/收起，保留原设置。修复解读地图菜单选择参数，正确选择匹配地图；成功同时核对背包消耗和同款已解读地图，补充选择及超时诊断。"
   }
 ]
