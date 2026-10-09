@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.20",
+    "AssemblyVersion": "0.6.2.21",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-09T14:55:01.953Z",
-    "Changelog": "工具其余参数统一随主开关展开/收起，保留原设置。修复解读地图菜单选择参数，正确选择匹配地图；成功同时核对背包消耗和同款已解读地图，补充选择及超时诊断。"
+    "LastUpdated": "2026-10-09T15:27:46.677Z",
+    "Changelog": "移除开发者模式的解读地图测试入口。标题栏改为全局启用数量，覆盖寻宝、狩猎、工具和PvP；未启用功能时显示“就绪”。"
   }
 ]
