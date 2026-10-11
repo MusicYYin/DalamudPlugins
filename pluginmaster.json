@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.21",
+    "AssemblyVersion": "0.6.2.22",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-09T15:27:46.677Z",
-    "Changelog": "移除开发者模式的解读地图测试入口。标题栏改为全局启用数量，覆盖寻宝、狩猎、工具和PvP；未启用功能时显示“就绪”。"
+    "LastUpdated": "2026-10-11T17:42:07.095Z",
+    "Changelog": "更新武士斩铁剑的队列、释放确认与重试；完善自动防御的恢复和过期请求处理；自动自愈新增忍者LB触发选项。PvP－视觉新增龙骑LB范围显示，可分别显示敌我5米/10米双圈。"
   }
 ]
