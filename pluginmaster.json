@@ -1,11 +1,11 @@
 [
   {
     "Author": "MusicYYin",
-    "Name": "Soumen",
+    "Name": "MianLab",
     "Punchline": "实用工具",
     "Description": "实用工具",
-    "InternalName": "Soumen",
-    "AssemblyVersion": "0.6.2.24",
+    "InternalName": "MianLab",
+    "AssemblyVersion": "0.6.2.25",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -17,15 +17,15 @@
     ],
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkInstall": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/Plugins/Soumen/latest.zip",
-    "DownloadLinkTesting": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/Plugins/Soumen/latest.zip",
-    "DownloadLinkUpdate": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/Plugins/Soumen/latest.zip",
+    "DownloadLinkInstall": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/Plugins/MianLab/latest.zip",
+    "DownloadLinkTesting": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/Plugins/MianLab/latest.zip",
+    "DownloadLinkUpdate": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/Plugins/MianLab/latest.zip",
     "LoadRequiredState": 0,
     "LoadSync": false,
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-14T05:59:03.542Z",
+    "LastUpdated": "2026-10-14T07:15:11.664Z",
     "Changelog": "解决了一些已知问题"
   }
 ]
