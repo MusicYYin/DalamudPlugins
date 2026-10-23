@@ -5,7 +5,7 @@
     "Punchline": "实用工具",
     "Description": "实用工具",
     "InternalName": "MianLab",
-    "AssemblyVersion": "0.6.3.0",
+    "AssemblyVersion": "0.6.4.0",
     "RepoUrl": "https://github.com/MusicYYin/DalamudPlugins",
     "IconUrl": "https://raw.githubusercontent.com/MusicYYin/DalamudPlugins/main/icon.png",
     "ApplicableVersion": "any",
@@ -25,7 +25,7 @@
     "LoadPriority": 0,
     "CanUnloadAsync": false,
     "AcceptsFeedback": true,
-    "LastUpdated": "2026-10-23T15:25:16.106Z",
+    "LastUpdated": "2026-10-23T16:48:32.837Z",
     "Changelog": "一次有用的更新"
   }
 ]
